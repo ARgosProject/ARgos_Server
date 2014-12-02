@@ -6,7 +6,7 @@ DIRHEA := include/
 
 CXX := g++
 
-CXXFLAGS := -Wall -O2 -std=c++0x
+CXXFLAGS := -Wall -O2 -std=c++0x -MMD -MP
 CXXFLAGS += `pkg-config --cflags opencv`
 
 INCLUDES := -I$(DIRHEA)
@@ -15,6 +15,7 @@ LDLIBS := -lboost_system -lboost_thread -lpthread
 LDLIBS += `pkg-config --libs opencv`
 
 OBJS := $(subst $(DIRSRC), $(DIROBJ), $(patsubst %.cpp, %.o, $(wildcard $(DIRSRC)*.cpp)))
+DEPS :=  $(OBJS:.o=.d)
 
 COLOR_FIN := \033[00m
 COLOR_OK := \033[01;32m
@@ -37,6 +38,8 @@ $(EXEC): $(OBJS)
 	@echo -e '$(COLOR_ENL)Enlazando$(COLOR_FIN): $(notdir $<)'
 	@$(CXX) -o $@ $^ $(LDLIBS)
 	@echo -e '$(COLOR_OK)Terminado.$(COLOR_FIN)'
+
+-include $(DEPS)
 
 $(DIROBJ)%.o: $(DIRSRC)%.cpp
 	@echo -e '$(COLOR_COMP)Compilando$(COLOR_FIN): $(notdir $<)'

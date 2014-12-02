@@ -1,9 +1,10 @@
 #include "Communicator.h"
+#include "Log.h"
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
-#include "Log.h"
+#include <ifaddrs.h>
 
-Communicator::Communicator(unsigned short port) : _port(port), _threadDone(true), _receive(false) {
+Communicator::Communicator(unsigned short port, const char* iface) : _port(port), _iface(iface), _threadDone(true), _receive(false) {
   _tcpSocket = new tcp::socket(_ioService);
 
 
@@ -55,40 +56,80 @@ void Communicator::waitForConnections() {
   tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
   while(1) {
-    Logger::Log::info("Servidor ARgos escuchando en puerto " + std::to_string(_port));
+    Logger::Log::info("Servidor ARgos escuchando en " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
     a.accept(*_tcpSocket);
     Logger::Log::success("Nueva conexión de " + _tcpSocket->remote_endpoint().address().to_string());
     receive();
   }
 }
 
+std::string Communicator::getIpFromInterface(const std::string& iface) {
+  struct ifaddrs *ifaddr, *ifa;
+  int s;
+  char host[NI_MAXHOST];
+  std::string ip("0.0.0.0");
+
+  if(getifaddrs(&ifaddr) == -1) {
+    Logger::Log::error("getifaddrs");
+    return ip;
+  }
+
+  for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    if(ifa->ifa_addr == NULL)
+      continue;
+
+    s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+    if((iface == ifa->ifa_name) && (ifa->ifa_addr->sa_family == AF_INET)) {
+      if(s != 0) {
+        Logger::Log::error("getnameinfo() falló: " + std::string(gai_strerror(s)));
+        return ip;
+      }
+
+      ip = std::string(host);
+    }
+  }
+
+  if(ip == "0.0.0.0") {
+    Logger::Log::error("Interfaz de red " + iface + " no encontrada");
+  }
+
+  freeifaddrs(ifaddr);
+
+  return ip;
+}
+
+void Communicator::readStreamTypeFromSocket(tcp::socket &socket, StreamType &st) {
+  unsigned char type_buf[sizeof(int)];
+  unsigned char size_buf[sizeof(int)];
+  unsigned char* data_buf;
+
+  boost::asio::read(socket, boost::asio::buffer(&type_buf, sizeof(int)));  // Type
+  memcpy(&st.type, &type_buf, sizeof(int));
+  boost::asio::read(socket, boost::asio::buffer(&size_buf, sizeof(int))); // Size
+  memcpy(&st.size, &size_buf, sizeof(int));
+
+  data_buf = new unsigned char[st.size];
+  boost::asio::read(socket, boost::asio::buffer(data_buf, st.size)); // Data
+  st.data.insert(st.data.end(), &data_buf[0], &data_buf[st.size]);
+  delete [] data_buf;
+}
+
 void Communicator::receive() {
   while(1) {
-    StreamType st;
-    unsigned char type_buf[sizeof(int)];
-    unsigned char size_buf[sizeof(int)];
-    unsigned char* data_buf;
-
     try {
-      boost::asio::read(*_tcpSocket, boost::asio::buffer(&type_buf, sizeof(int)));  // Type
-      memcpy(&st.type, &type_buf, sizeof(int));
-      boost::asio::read(*_tcpSocket, boost::asio::buffer(&size_buf, sizeof(int))); // Size
-      memcpy(&st.size, &size_buf, sizeof(int));
-
-      data_buf = new unsigned char[st.size];
-      boost::asio::read(*_tcpSocket, boost::asio::buffer(data_buf, st.size)); // Data
-      st.data.insert(st.data.end(), &data_buf[0], &data_buf[st.size]);
-      delete [] data_buf;
+      StreamType st;
+      readStreamTypeFromSocket(*_tcpSocket, st);
 
       switch(st.type) {
       case Type::VECTOR_I:
-        proccessVectori(st);
+        processVectori(st);
         break;
       case Type::MATRIX_16F:
-        proccessMatrix16f(st);
+        processMatrix16f(st);
         break;
       case Type::CV_MAT:
-        proccessCvMat(st);
+        processCvMat(st);
         _receive = true;
         _condReceive.notify_one();
         break;
@@ -207,7 +248,7 @@ size_t Communicator::sendCvMatVideoStream(const cv::Mat& mat, udp::socket& udpSo
   return bytes;
 }
 
-void Communicator::proccessMatrix16f(StreamType& st) {
+void Communicator::processMatrix16f(StreamType& st) {
   Logger::Log::success("Nueva matriz de 16 float recibida. Size: " + std::to_string(st.size));
 
   int num_floats = st.size/sizeof(float);
@@ -218,7 +259,7 @@ void Communicator::proccessMatrix16f(StreamType& st) {
 
 }
 
-void Communicator::proccessVectori(StreamType& st) {
+void Communicator::processVectori(StreamType& st) {
   Logger::Log::success("Nuevo std::vector<int> recibido. Size: " + std::to_string(st.size));
 
   int num_ints = st.size/sizeof(int);
@@ -229,7 +270,7 @@ void Communicator::proccessVectori(StreamType& st) {
 
 }
 
-void Communicator::proccessCvMat(StreamType& st) {
+void Communicator::processCvMat(StreamType& st) {
   Logger::Log::success("Nueva cv::Mat recibida. Size: " + std::to_string(st.size));
 
   cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
@@ -253,38 +294,37 @@ void Communicator::proccessCvMat(StreamType& st) {
   //paperDetector.detect(currentFrame,paperList, cameraProjector, paperSize, false, true);      // Camera
 
   numInvoices = paperList.size();
-  /*
-    if (initVideoConference){
-    if ( paperList.size() == 0)
-    initVideoConference = false;
-    }
 
-    else{
-  */
-  if (paperList.size() == 0 ){
-    //cout << "Detecting NONE" << endl;
-    isPreviousPaperDetected = false;
-    previousNumInvoices = 0;
-    numFrames = 0;
+  if(initVideoConference){
+    if(paperList.size() == 0)
+      initVideoConference = false;
   }
-  else{
-    if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices) || numFrames > 30){
-      isPreviousPaperDetected = true;
+
+  else {
+    if (paperList.size() == 0 ){
+      //cout << "Detecting NONE" << endl;
+      isPreviousPaperDetected = false;
+      previousNumInvoices = 0;
       numFrames = 0;
-      previousNumInvoices = numInvoices;
+    }
+    else{
+      if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices) || numFrames > 30){
+        isPreviousPaperDetected = true;
+        numFrames = 0;
+        previousNumInvoices = numInvoices;
 
-      documentDetector->detect(currentFrame,paperList);
+        documentDetector->detect(currentFrame,paperList);
 
-      invoicesIndex.clear();
-      //cout <<  "invoicesIndex clear "<< endl;
-      for (unsigned int i=0; i<paperList.size(); i++){
-        //if (paperList[i].getId() == 999) initVideoConference = true;
-        invoicesIndex.push_back(paperList[i].getId());
-        //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+        invoicesIndex.clear();
+        //cout <<  "invoicesIndex clear "<< endl;
+        for (unsigned int i=0; i<paperList.size(); i++){
+          //if (paperList[i].getId() == 999) initVideoConference = true;
+          invoicesIndex.push_back(paperList[i].getId());
+          //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+        }
       }
     }
   }
-  //}
 
   // Send Mat to Raspberry pi
 
@@ -308,8 +348,7 @@ void Communicator::proccessCvMat(StreamType& st) {
   //addCvMat(projectorFrame);
   //addVectorPapers(paperList);
 
-  //if(!paperList.empty())
-  addPaper(paperList.back());
+  (paperList.empty())?addSkip():addPaper(paperList.back());
 }
 
 int Communicator::send() const {
@@ -349,6 +388,10 @@ void Communicator::addVectori(const std::vector<int>& vector) {
   addInt(size);
 
   _buff.insert(_buff.end(), &sVector[0], &sVector[size]);                // Datos
+}
+
+void Communicator::addSkip() {
+  addInt((int)Type::SKIP);
 }
 
 void Communicator::addCvMat(const cv::Mat& mat) {

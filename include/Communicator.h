@@ -35,11 +35,13 @@ using boost::asio::ip::udp;
 class Communicator {
 public:
   enum Type {
+    SKIP          = -1,
+
     VECTOR_I      =  0,
     MATRIX_16F    =  1,
     CV_MAT        =  2,
     VIDEO_STREAM  =  3,
-    PAPER         =  4,
+    PAPER         =  4
   };
 
 public:
@@ -50,15 +52,17 @@ public:
   };
 
 public:
-  explicit Communicator(unsigned short port);
+  explicit Communicator(unsigned short port, const char* iface);
   ~Communicator();
 
   void waitForConnections();
+  std::string getIpFromInterface(const std::string& iface);
 
+  void readStreamTypeFromSocket(tcp::socket &socket, StreamType &st);
   void receive();
-  void proccessMatrix16f(StreamType& st);
-  void proccessVectori(StreamType& st);
-  void proccessCvMat(StreamType& st);
+  void processMatrix16f(StreamType& st);
+  void processVectori(StreamType& st);
+  void processCvMat(StreamType& st);
 
   void startVideoStream(StreamType st);
   size_t sendCvMatVideoStream(const cv::Mat& mat, udp::socket& udpSocket, const udp::endpoint& udpEndpoint);
@@ -67,6 +71,8 @@ public:
   void addInt(int val);
   void addMatrix16f(const float* matrix);
   void addVectori(const std::vector<int>& vector);
+
+  void addSkip();
   void addCvMat(const cv::Mat& mat);
   void addPaper(Paper& paper);
   void addVectorCvMat(const std::vector<cv::Mat>& mats);
@@ -78,6 +84,7 @@ private:
   boost::asio::io_service _ioService;
   tcp::socket* _tcpSocket;
   unsigned short _port;
+  std::string _iface;
   std::vector<unsigned char> _buff;
 
   std::shared_ptr<std::thread> _videoThread;
