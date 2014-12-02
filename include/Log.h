@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-namespace Logger {
+namespace argosServer {
 
   /**
    * A utility class for logging
@@ -115,14 +115,9 @@ namespace Logger {
   template<typename T>
   void Log::matrix(const T* matrix) {
     for(int i = 0; i < 16; i += 4) {
-      if(i < 4) {
-        std::cout << currentDateTime() << " [ ";
-      }
-      else {
-        std::cout << "                      [ ";
-      }
+      std::cout << currentDateTime() << " [ ";
       std::cout << matrix[i] << " " << matrix[i+1] << " " << matrix[i+2] << " " << matrix[i+3];
-      std::cout << " ] " << std::endl;
+      std::cout << "] " << std::endl;
     }
   }
 
