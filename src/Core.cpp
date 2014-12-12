@@ -187,9 +187,10 @@ namespace argosServer{
       }
     }
     
-    for (unsigned int i=0; i<paperList.size(); i++)
+    for (unsigned int i=0; i<paperList.size(); i++){
+      Log::info(std::to_string(invoicesIndex[i]));
       paperList[i].setId(invoicesIndex[i]);
-    
+    }
     return paperList;
     
   }

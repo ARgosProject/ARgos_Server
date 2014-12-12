@@ -10,8 +10,9 @@ using namespace cv;
 namespace argosServer{
 
   PaperDetector::PaperDetector(){
-    thresMethod = ADPT_THRES;
-    thresParam1 = thresParam2 = 7;
+    thresMethod = CANNY;
+    thresParam1 = 90;
+    thresParam2 = 255;
     minContourValue = 0.1;
     maxContourValue = 0.8;
     contourAreaValue = 5000;
@@ -44,9 +45,10 @@ namespace argosServer{
     //cv::threshold(greyFrame, outThres, 127, 255, 0);
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
-    //cv::dilate(outThres, outThres, cv::Mat(), cv::Point(-1,-1));
+    cv::dilate(outThres, outThres, cv::Mat(), cv::Point(-1,-1));
     outThres.copyTo(thres2);
-
+    imshow("Threshold", outThres);
+    waitKey(1);
     //find all rectangles in the thresholdes image
     vector<PaperCandidate> PaperCandidates;
     vector<PaperCandidate> OutPaperCandidates;
@@ -65,6 +67,10 @@ namespace argosServer{
     //for (size_t i = 0; i < contours.size(); i++)
     //  drawContour(debug,contours[i],Scalar(255,0,225));
   
+
+    // Hough Line Transform
+    //houghLineTransform()
+
   
     // Sort the points in anti-clockwise order
     valarray<bool> swapped(false,PaperCandidates.size());  //used later
