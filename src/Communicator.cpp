@@ -245,7 +245,7 @@ namespace argosServer{
   }
 
   void Communicator::processCvMat(StreamType& st) {
-    Log::success("Nueva cv::Mat recibida. Size: " + std::to_string(st.size));
+    //Log::success("Nueva cv::Mat recibida. Size: " + std::to_string(st.size));
 
     cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
 
@@ -261,9 +261,9 @@ namespace argosServer{
 
   int Communicator::send() const {
     int buff_size = _buff.size();
-    Log::info("Intentando enviar " + std::to_string(buff_size) + " bytes...");
+    //Log::info("Intentando enviar " + std::to_string(buff_size) + " bytes...");
     int bytes = boost::asio::write(*_tcpSocket, boost::asio::buffer(_buff, buff_size));
-    Log::success(std::to_string(bytes) + " bytes enviados.");
+    //Log::success(std::to_string(bytes) + " bytes enviados.");
 
     return bytes;
   }
