@@ -11,7 +11,7 @@ namespace argosServer{
 
   PaperDetector::PaperDetector(){
     thresMethod = CANNY;
-    thresParam1 = 90;
+    thresParam1 = 160;
     thresParam2 = 255;
     minContourValue = 0.1;
     maxContourValue = 0.8;
@@ -45,7 +45,7 @@ namespace argosServer{
     //cv::threshold(greyFrame, outThres, 127, 255, 0);
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
-    cv::dilate(outThres, outThres, cv::Mat(), cv::Point(-1,-1));
+    //cv::dilate(outThres, outThres, cv::Mat(), cv::Point(-1,-1));
     outThres.copyTo(thres2);
     imshow("Threshold", outThres);
     waitKey(1);
