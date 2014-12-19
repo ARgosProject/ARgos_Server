@@ -1,5 +1,6 @@
 #include "Core.h"
 #include "Log.h"
+#include "HandDetector.h"
 
 namespace argosServer{
 
@@ -48,6 +49,10 @@ namespace argosServer{
     // Document detector initialization
     DocumentDetector::getInstance();
     
+
+    // Hand and finger detector initialization
+    HandDetector::getInstance();
+
     
     lastSearch = "NONE";
     isPreviousPaperDetected = false;
@@ -153,6 +158,14 @@ namespace argosServer{
     //Detection of papers in the image passed
     PaperDetector::getInstance().detect(currentFrame,paperList, cameraProjector, paperSize, false, false);   // Projector
     //PaperDetector::getInstance()->detect(currentFrame,paperList, cameraProjector, paperSize, true, true);    // Camera
+    
+    cv::Point fingerPoint;
+    HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
+    
+
+    if(fingerPoint.x >= 0 $$ fingerPoint.y >= 0)
+      PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
+
     
     numInvoices = paperList.size();
     

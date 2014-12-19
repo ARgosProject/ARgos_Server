@@ -247,8 +247,8 @@ namespace argosServer{
   void Communicator::processCvMat(StreamType& st) {
     //Log::success("Nueva cv::Mat recibida. Size: " + std::to_string(st.size));
 
-    cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
-
+    //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
+    cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
     //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
     //projectorFrame = Core::getInstance()->processCvMat(currentFrame);
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);

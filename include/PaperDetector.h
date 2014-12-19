@@ -171,6 +171,7 @@ namespace argosServer{
     cv::Mat calculateAverage(std::deque<cv::Mat> &matrix);
 
 
+   
 
 
   private:
@@ -189,7 +190,14 @@ namespace argosServer{
     ThresholdMethods thresMethod;             /// Current threshold method
     double thresParam1, thresParam2;          /// Threshold parameters
   
-  
+    bool acceptLinePair(Vec2f line1, Vec2f line2, float minTheta);
+    Point computeIntersect(Vec2i line1, Vec2i line2);
+    vector<Point> lineToPointPair(Vec2i line);
+    
+    void houghLineTransform(cv::Mat& image, vector<PaperCandidate> &PaperCandidates);
+    Point computeIntersect(cv::Vec4i a, cv::Vec4i b);
+    void sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center);
+
     // ----------------------- Detection methods------------------------------------------------
     // Find Rectangles
     //vector of candidates to be markers. This is a vector with a set of rectangles that have no valid id
@@ -210,7 +218,6 @@ namespace argosServer{
      * This function returns in PaperCandidates all the rectangles found in a thresolded image
      */
     void convexHullContours(vector<vector<cv::Point> > &contours, vector<PaperCandidate> &PaperCandidates);
-
 
 
     //-Utils-----------------------------------------------------------------------------------------
@@ -251,7 +258,7 @@ namespace argosServer{
     void drawContour(cv::Mat &in,vector<Point>  &contour,cv::Scalar color);
     void drawAllContours(cv::Mat input, vector<vector<cv::Point> > &contours);
     void draw(cv::Mat out,const vector<Paper> &markers );
-  
+    void drawApproxCurve ( Mat &in,vector<Point2f>  &contour,Scalar color );
   };
 }
   
