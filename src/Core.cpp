@@ -163,8 +163,8 @@ namespace argosServer{
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
     
 
-    if(fingerPoint.x >= 0 $$ fingerPoint.y >= 0)
-      PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
+    //if(fingerPoint.x >= 0 && fingerPoint.y >= 0)
+    //PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
 
     
     numInvoices = paperList.size();
