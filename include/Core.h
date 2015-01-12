@@ -20,52 +20,52 @@
 // Singleton
 #include "Singleton.h"
 
-namespace argosServer{
+namespace argosServer {
   /**
    * Server side main logic
    */
   class Core: public Singleton<Core> {
-    
+
   public:
     /**
      * Default Constructor
      */
     Core();
-    
+
     /**
      * Default Destructor
      */
     virtual ~Core();
 
     /**
-     * Finds and indentify papers and then return a cv::Mat to send     
+     * Finds and indentify papers and then return a cv::Mat to send
      */
-    vector<Paper> processCvMat(cv::Mat&);
+    //vector<Paper> processCvMat(cv::Mat&);
 
     /**
-     * Finds and indentify papers and then return a vector of Papers   
+     * Finds and indentify papers and then return a vector of Papers
      */
-    vector<Paper>&  processOpenGL(cv::Mat&, bool&);
-  
+    vector<Paper>&  update(cv::Mat&, bool&);
+
   private:
-    cv::Mat currentFrame;	                ///<  Current frame
-    cv::Mat projectorFrame; 	            ///<  Projector openCV frame
+    cv::Mat currentFrame;                 ///<  Current frame
+    cv::Mat projectorFrame;               ///<  Projector openCV frame
     cv::Mat background;                     ///<  Background and logos
     CameraProjectorSystem cameraProjector;  ///<  Intrinsics and extrinsics camera-projector parameters
 
     vector<Paper> paperList;                ///<  Vector of detected papers
-    Size paperSize;                         ///<  Paper size in cm 
-    
-    
+    Size paperSize;                         ///<  Paper size in cm
+
+
     cv::Mat video;                          ///<  Video image test
     cv::Mat bg_out;                         ///<  Background image test
     cv::Mat M;                              ///<  Background image test
-    
+
     vector<string> invoices;
     vector<int> invoicesIndex;
     string lastSearch;
     bool isPreviousPaperDetected;
-    
+
     int numFrames;
     int numInvoices;
     int previousNumInvoices;
