@@ -7,21 +7,21 @@
 #include <ifaddrs.h>
 
 namespace argosServer{
-  
-  
+
+
   Communicator::Communicator(unsigned short port, const char* iface) : _port(port), _iface(iface), _threadDone(true), _receive(false) {
     _tcpSocket = new tcp::socket(_ioService);
-    
+
     Core::getInstance();
     initVideoConference = false;
-    
+
   }
-  
+
   Communicator::~Communicator() {
     if(_tcpSocket)
       delete _tcpSocket;
   }
-  
+
   void Communicator::waitForConnections() {
     tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
@@ -46,17 +46,17 @@ namespace argosServer{
 
     for(ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
       if(ifa->ifa_addr == NULL)
-	continue;
+        continue;
 
       s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
 
       if((iface == ifa->ifa_name) && (ifa->ifa_addr->sa_family == AF_INET)) {
-	if(s != 0) {
-	  Log::error("getnameinfo() falló: " + std::string(gai_strerror(s)));
-	  return ip;
-	}
+        if(s != 0) {
+          Log::error("getnameinfo() falló: " + std::string(gai_strerror(s)));
+          return ip;
+        }
 
-	ip = std::string(host);
+        ip = std::string(host);
       }
     }
 
@@ -88,44 +88,44 @@ namespace argosServer{
   void Communicator::receive() {
     while(1) {
       try {
-	StreamType st;
-	readStreamTypeFromSocket(*_tcpSocket, st);
+        StreamType st;
+        readStreamTypeFromSocket(*_tcpSocket, st);
 
-	switch(st.type) {
-	case Type::VECTOR_I:
-	  processVectori(st);
-	  break;
-	case Type::MATRIX_16F:
-	  processMatrix16f(st);
-	  break;
-	case Type::CV_MAT:
-	  processCvMat(st);
-	  _receive = true;
-	  _condReceive.notify_one();
-	  break;
-	default:
-	  break;
-	}
+        switch(st.type) {
+        case Type::VECTOR_I:
+          processVectori(st);
+          break;
+        case Type::MATRIX_16F:
+          processMatrix16f(st);
+          break;
+        case Type::CV_MAT:
+          processCvMat(st);
+          _receive = true;
+          _condReceive.notify_one();
+          break;
+        default:
+          break;
+        }
 
-	if(initVideoConference) {
-	  if(_threadDone) {
-	    Log::video("Nueva videoconferencia iniciada");
-	    _threadDone = false;
-	    _videoThread.reset();
-	    _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this, st);
-	    _videoThread->detach();
-	  }
-	}
+        if(initVideoConference) {
+          if(_threadDone) {
+            Log::video("Nueva videoconferencia iniciada");
+            _threadDone = false;
+            _videoThread.reset();
+            _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this, st);
+            _videoThread->detach();
+          }
+        }
 
-	if(!_buff.empty()) {
-	  send();
-	  _buff.clear();
-	}
+        if(!_buff.empty()) {
+          send();
+          _buff.clear();
+        }
       }
       catch(boost::system::system_error const& e) {
-	Log::error("Se perdió la conexión del cliente. " + std::string(e.what()));
-	_tcpSocket->close();
-	break;
+        Log::error("Se perdió la conexión del cliente. " + std::string(e.what()));
+        _tcpSocket->close();
+        break;
       }
     }
   }
@@ -158,36 +158,36 @@ namespace argosServer{
 
     cv::Mat frame;
 
-   while(initVideoConference) {
-     // Frame receive
-     _receive = false;
-     
-     std::unique_lock<std::mutex> lock(_mutex);
-     while(!_receive) {
-       _condReceive.wait(lock);
-     }
-     
-     imshow(videoStream, currentFrame);
-         
-     // Frame grab
-     if(!cam.grab()) continue;
-     if(!cam.retrieve(frame) || frame.empty()) continue;
-     if(cv::waitKey(30) >= 0) break;
-     
-     // Frame send
-     cv::flip(frame, frame, 0);
-     cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-     size_t bytes = sendCvMatVideoStream(frame, udpSocket, udpEndpoint);
-     if(bytes > 0) {
-       Log::info("Frame: " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows)
-		 + ", " + std::to_string(bytes) + " bytes.");
-     }
-   }
-   
-   destroyWindow(videoStream);
-   _threadDone = true;
+    while(initVideoConference) {
+      // Frame receive
+      _receive = false;
+
+      std::unique_lock<std::mutex> lock(_mutex);
+      while(!_receive) {
+        _condReceive.wait(lock);
+      }
+
+      imshow(videoStream, currentFrame);
+
+      // Frame grab
+      if(!cam.grab()) continue;
+      if(!cam.retrieve(frame) || frame.empty()) continue;
+      if(cv::waitKey(30) >= 0) break;
+
+      // Frame send
+      cv::flip(frame, frame, 0);
+      cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+      size_t bytes = sendCvMatVideoStream(frame, udpSocket, udpEndpoint);
+      if(bytes > 0) {
+        Log::info("Frame: " + std::to_string(frame.cols) + "x" + std::to_string(frame.rows)
+                  + ", " + std::to_string(bytes) + " bytes.");
+      }
+    }
+
+    destroyWindow(videoStream);
+    _threadDone = true;
   }
-  
+
   size_t Communicator::sendCvMatVideoStream(const cv::Mat& mat, udp::socket& udpSocket, const udp::endpoint& udpEndpoint) {
     size_t bytes = 0;
     std::vector<unsigned char> output;
@@ -250,13 +250,16 @@ namespace argosServer{
     //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
     cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
     //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
-    //projectorFrame = Core::getInstance()->processCvMat(currentFrame);
+    //projectorFrame = Core::getInstance().processCvMat(currentFrame);
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
     //addCvMat(projectorFrame);
-    
-    paperList = Core::getInstance().processOpenGL(currentFrame, initVideoConference);
-  
-    (paperList.empty())?addSkip():addPaper(paperList.back());
+
+    paperList = Core::getInstance().update(currentFrame, initVideoConference);
+
+    if(paperList.empty())
+      addSkip();
+    else
+      addPaper(paperList.back());
   }
 
   int Communicator::send() const {
@@ -362,4 +365,4 @@ namespace argosServer{
       addPaper(papers[i]);
     }
   }
-} 
+}
