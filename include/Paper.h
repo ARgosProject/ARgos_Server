@@ -15,16 +15,7 @@ namespace argosServer{
  *\brief This class represents a sheet of paper. It is a vector of the fours corners of the paper
  *
  */
-
-  struct action{
-    int id;
-    string description;
-    //argos::Script* script;
-    
-  };
-
-
-
+  
   class Paper: public vector<cv::Point2f> {
   public:
     /**
@@ -137,12 +128,10 @@ namespace argosServer{
     }
 
   protected:
-    int id;                 // id of document detected
-    cv::Size paperSize;     // size of the paper sides in meters
-    cv::Mat rotVec;         // rotation matrix (Object->Projector)
-    cv::Mat transVec;       // translation matrix (Object->Projector)
-    
-  
+    int id;                                 // id of document detected
+    cv::Size paperSize;                     // size of the paper sides in meters
+    cv::Mat rotVec;                         // rotation matrix (Object->Projector)
+    cv::Mat transVec;                       // translation matrix (Object->Projector)
   };
 }
 #endif
