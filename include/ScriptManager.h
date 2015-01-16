@@ -29,7 +29,7 @@ namespace argosServer {
 
   private:
     std::map<std::string, ScriptFunction*> _handlers;
-    std::map<std::string, Script*>& _scripts;
+    std::map<std::string, Script*> _scripts;
   };
 
 }

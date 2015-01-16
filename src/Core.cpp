@@ -10,26 +10,26 @@ namespace argosServer{
     //- Read configuration file ----
     Log::info("Reading configuration file... ");
     ConfigManager::loadConfiguration("data/config.xml");
-    
+
     //- Camera & Projector Parameters ----
     Log::info("Loading camera & projector parameters... ");
     cameraProjector.load(ConfigManager::getCameraCalibration(),ConfigManager::getProjectorCalibration(), ConfigManager::getExtrinsics());
-    
+
     if(!cameraProjector.isValid()){
       Log::error("Camera or projector parameters is not set, need to run the calibrator tool");
       exit(1);  // throw "Camera parameters is not set";
     }
     else
       Log::success("Camera & projector parameters... OK");
-    
+
 
     //- Script loading
-    ScriptManager::getInstance().loadScripts("data/scripts_list.xml");
+    ScriptManager::getInstance().loadScripts("data/");
 
-    
+
     // Actions in Papers
     //ActionsManager::getInstance().loadConfigPapers("data/argos_papers.xml");
-        
+
     // background
     //background = imread("background_distorted.jpg", CV_LOAD_IMAGE_COLOR );
 
