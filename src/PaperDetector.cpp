@@ -31,7 +31,7 @@ namespace argosServer{
    *
    *
    ************************************/
-  void PaperDetector::detect(const cv::Mat& currentFrame,vector<Paper>& detectedPapers, CameraProjectorSystem& cameraProjector,cv::Size paperSizeMeters, bool setYPerperdicular,  bool screenExtrinsics) throw (cv::Exception){
+  void PaperDetector::detect(const cv::Mat& currentFrame,vector<Paper>& detectedPapers, CameraProjectorSystem& cameraProjector,cv::Size paperSizeMeters, bool screenExtrinsics, bool setYPerperdicular) throw (cv::Exception){
     //clear input data
     detectedPapers.clear();
     currentFrame.copyTo(debug);
