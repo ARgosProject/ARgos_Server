@@ -2,25 +2,34 @@
 #include "Log.h"
 #include "HandDetector.h"
 #include "ScriptManager.h"
+#include "ConfigManager.h"
 
 namespace argosServer{
 
   Core::Core(){
-    // Read configuration file
+    //- Read configuration file ----
     Log::info("Reading configuration file... ");
-    //Configuration::getInstance()->readFile();
-
+    ConfigManager::loadConfiguration("data/config.xml");
+    
     //- Camera & Projector Parameters ----
     Log::info("Loading camera & projector parameters... ");
-    cameraProjector.load("calibrationCamera.yml", "calibrationProjector.yml", "CameraProjectorExtrinsics.yml");
+    cameraProjector.load(ConfigManager::getCameraCalibration(),ConfigManager::getProjectorCalibration(), ConfigManager::getExtrinsics());
+    
     if(!cameraProjector.isValid()){
       Log::error("Camera or projector parameters is not set, need to run the calibrator tool");
       exit(1);  // throw "Camera parameters is not set";
     }
+    else
+      Log::success("Camera & projector parameters... OK");
+    
 
-    // Script loading
+    //- Script loading
     ScriptManager::getInstance().loadScripts("data/scripts_list.xml");
 
+    
+    // Actions in Papers
+    //ActionsManager::getInstance().loadConfigPapers("data/argos_papers.xml");
+        
     // background
     //background = imread("background_distorted.jpg", CV_LOAD_IMAGE_COLOR );
 
@@ -39,14 +48,6 @@ namespace argosServer{
     //bg_out.copyTo(projectorFrame);
 
 
-    //Paper size : {A4,A5}
-    //paperSize = Configuration::getInstance()->getPaperSize();
-    //paperSize = Size(27.3, 43.0);     // Projection Size
-    //paperSize = Size(27.1, 42.7);     // Projection Size
-    paperSize = Size(21.0, 29.7);     // Paper Size A4
-    //paperSize = Size(14.8, 21.0);     // Paper Size A5
-
-
     // Paper detector initilization
     PaperDetector::getInstance();
 
@@ -55,7 +56,7 @@ namespace argosServer{
 
 
     // Hand and finger detector initialization
-    HandDetector::getInstance();
+    //HandDetector::getInstance();
 
 
     lastSearch = "NONE";
@@ -160,8 +161,7 @@ namespace argosServer{
     numFrames++;
 
     //Detection of papers in the image passed
-    PaperDetector::getInstance().detect(currentFrame,paperList, cameraProjector, paperSize, false, false);   // Projector
-    //PaperDetector::getInstance()->detect(currentFrame,paperList, cameraProjector, paperSize, true, true);    // Camera
+    PaperDetector::getInstance().detect(currentFrame,paperList, cameraProjector, ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay);
 
     cv::Point fingerPoint;
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);

@@ -1,5 +1,5 @@
 /**
-   @file PaperDetector.cpp
+   @file PaperDetector.h
    @brief 
    @author Manuel Hervas
    @date 06/2014
@@ -76,7 +76,7 @@ namespace argosServer{
      */
  
     void detect (const cv::Mat& currentFrame, std::vector<Paper>& detectedPapers, CameraProjectorSystem& camProjector,
-		 cv::Size paperSizeMeters, bool setYPerpendicular, bool screenExtrinsics) throw (cv::Exception);
+		 cv::Size paperSizeMeters, bool screenExtrinsics,  bool setYPerpendicular = false) throw (cv::Exception);
   
     /**
      *  Sets the type of thresholding methods available
