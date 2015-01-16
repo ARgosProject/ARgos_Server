@@ -21,7 +21,7 @@ namespace argosServer {
     ~ScriptManager();
 
     void loadScripts(const std::string& path);
-    void runScript(const std::string& name);
+    void runScript(const std::string& file_name);
     void update();
 
   private:
@@ -29,7 +29,7 @@ namespace argosServer {
 
   private:
     std::map<std::string, ScriptFunction*> _handlers;
-    std::map<std::string, Script*> _scripts;
+    std::map<std::string, Script*>& _scripts;
   };
 
 }
