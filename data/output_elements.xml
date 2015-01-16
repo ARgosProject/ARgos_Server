@@ -1,0 +1,11 @@
+<output_elements>
+  <paper id="0">
+    <element id="0" description="textPanel" position_x="100" position_y="200" type="0" />
+    <element id="1" description="highlight" position_x="300" position_y="400" type="1" />
+  </paper>
+  <paper id="1">
+    <element id="0" description="button" position_x="100" position_y="200" type="2" />
+    <element id="1" description="audio" position_x="0" position_y="0" type="3" />
+    <element id="2" description="video" position_x="300" position_y="500" type="4" />
+  </paper>
+</output_elements>
