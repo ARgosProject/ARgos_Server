@@ -96,7 +96,7 @@ namespace argosServer{
     /**
      * Reads query filenames
      */
-    bool readImages( const string& queryFilename, vector <Mat>& queryImages, vector<string>& queryImageNames );
+    bool readImages();
     
     /**
      * Returns a image with content of paper (warpping corrected)

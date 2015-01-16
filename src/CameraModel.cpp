@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace argosServer{
-
+  
   /* ---------------- Intrinsics ------------------------------*/
   Intrinsics::Intrinsics(){
     cameraMatrix = cv::Mat::eye(3,3,CV_32FC1);
@@ -72,7 +72,7 @@ namespace argosServer{
   cv::Point2d Intrinsics::getPrincipalPoint() const {
     return principalPoint;
   }
-
+  
   /**Adjust the parameters to the size of the image indicated
    */
   void Intrinsics::resize(cv::Size size)throw(cv::Exception){
@@ -87,19 +87,19 @@ namespace argosServer{
     cameraMatrix.at<float>(1,1) *= AyFactor;
     cameraMatrix.at<float>(1,2) *= AyFactor;
   }
-
-
-
-
+  
+  
+  
+  
   /* ------------- Camera Model -----------------------------------*/
-
-
+  
+  
   CameraModel::CameraModel(){
     distortedIntrinsics = Intrinsics();
     undistortedIntrinsics = Intrinsics();
     distCoeffs = cv::Mat::zeros(5,1,CV_32FC1);
   }
-
+  
   CameraModel::CameraModel(cv::Mat cameraMatrix, cv::Mat distCoeffs, cv::Size imageSize){
     distortedIntrinsics = Intrinsics(cameraMatrix, imageSize);
     distCoeffs.copyTo(this->distCoeffs);
@@ -158,10 +158,10 @@ namespace argosServer{
     fs["sensorSize_width"] >> sensorSize.width;
     fs["sensorSize_height"] >> sensorSize.height;
     fs["distCoeffs"] >> distCoeffs;
-
+    
     if (cameraMatrix.cols == 0 || cameraMatrix.rows == 0) 
       throw cv::Exception(9007,"File :"+filename+" does not contains valid camera matrix","CameraModel::loadFile",__FILE__,__LINE__);
-
+    
     if (imageSize.width == -1 || imageSize.height == 0) 
       throw cv::Exception(9007,"File :"+filename+" does not contains valid camera dimensions","CameraModel::loadFile",__FILE__,__LINE__);
     
@@ -188,11 +188,11 @@ namespace argosServer{
     //now, add translation information
     for (int i=0;i<3;i++)
       m4x4.at<float>(i,3) = transVec.at<float>(0,i);
-  
+    
     //invert the matrix
     m4x4.inv();
     return  cv::Point3f(m4x4.at<float>(0,0), m4x4.at<float>(0,1), m4x4.at<float>(0,2));
-  
+    
   }
 
   void CameraModel::glGetProjectionMatrix(cv::Size orgImgSize, cv::Size size, float proj_matrix[16], float gnear, float gfar, bool invert)throw(cv::Exception){
@@ -382,7 +382,7 @@ namespace argosServer{
   void CameraModel::undistort(const cv::Mat& src, cv::Mat& dst, int interpolationMode) {
     cv::remap(src, dst, __undistortMapX, __undistortMapY, interpolationMode);
   }
-
+  
   
   void CameraModel::updateUndistortion() {
     cv::Mat undistortedCameraMatrix = cv::getOptimalNewCameraMatrix(distortedIntrinsics.getCameraMatrix(), distCoeffs, distortedIntrinsics.getImageSize(), false);

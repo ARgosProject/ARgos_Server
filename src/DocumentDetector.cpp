@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include "DocumentDetector.h"
+#include "ConfigManager.h"
+#include "Log.h"
 
 using namespace std;
 using namespace cv;
@@ -11,23 +13,24 @@ namespace argosServer{
   
   DocumentDetector::DocumentDetector(){
     // Default Configuration
-    const string fileWithQueryImages = "./queryImages.txt";
+    //const string fileWithQueryImages = "./queryImages.txt";
     
     // Create Feature Detectors and Descriptors
     createDetectorDescriptorMatcher();
-    
+
+    queryImagesNames = ConfigManager::getDescriptorsList();
+
     // Read query images
-    readImages(fileWithQueryImages, queryImages, queryImagesNames);
+    readImages();
     
     //Extracting keypoints from query images
-    cout << endl << "< Extracting keypoints from images..." << endl;  
     featureDetector->detect( queryImages, queryKeypoints );
-    cout << ">" << endl;
+    Log::success("Extracting keypoints from images... [OK]");
     
     //Compute descriptor from query images
-    cout << "< Computing descriptors for keypoints..." << endl;
+
     descriptorExtractor->compute( queryImages, queryKeypoints, queryDescriptors );
-    cout << ">" << endl;
+    Log::success("Computing descriptors for keypoints... [OK]");
     /*
       FileStorage fs("Descriptors.yml", FileStorage::WRITE);
       for(size_t i=0; i< queryDescriptors.size(); i++){
@@ -107,16 +110,14 @@ namespace argosServer{
 
 
   bool DocumentDetector::createDetectorDescriptorMatcher(){
-    cout << "< Creating feature detector, descriptor extractor and descriptor matcher ..." << endl;
+    Log::info("Creating feature detector, descriptor extractor and descriptor matcher ...");
     featureDetector = new cv::SurfFeatureDetector(2000,4);
     descriptorExtractor = new cv::SurfDescriptorExtractor();
     descriptorMatcher = cv::Ptr<cv::DescriptorMatcher>(new cv::FlannBasedMatcher(cv::Ptr<cv::flann::IndexParams>(new cv::flann::KDTreeIndexParams())));
   
-    cout << ">" << endl;
-  
     bool isCreated = !( featureDetector.empty() || descriptorExtractor.empty() || descriptorMatcher.empty() );
     if( !isCreated )
-      cout << "Can not create feature detector or descriptor extractor or descriptor matcher of given types." << endl << ">" << endl;
+      Log::error("Can not create feature detector or descriptor extractor or descriptor matcher of given types.");
   
     return isCreated;
   }
@@ -144,8 +145,8 @@ namespace argosServer{
     file.close();
   }
 
-  bool DocumentDetector::readImages( const string& queryFilename, vector <Mat>& queryImages, vector<string>& queryImageNames ){
-  
+  bool DocumentDetector::readImages(){
+    /*
     cout << "< Reading the images..." << endl;
     string queryDirName;
     readQueryFilenames(queryFilename, queryDirName, queryImageNames);
@@ -154,36 +155,38 @@ namespace argosServer{
       cout << "Query image filenames can not be read." << endl << ">" << endl;
       return false;
     }
-  
+    */
+    
+
     int readImageCount = 0;
-    for( size_t i = 0; i < queryImageNames.size(); i++ ){
-      string filename = queryDirName + queryImageNames[i];
+    for( size_t i = 0; i < queryImagesNames.size(); i++ ){
+      string filename = queryImagesNames[i];
       Mat img = imread( filename, CV_LOAD_IMAGE_GRAYSCALE );
       if( img.empty() )
-	cout << "Query image " << filename << " can not be read." << endl;
+	Log::error("Query image " + filename + " can not be read.");
       else
 	readImageCount++;
       queryImages.push_back( img );
     }
   
     if(!readImageCount){
-      cout << "All query images can not be read." << endl << ">" << endl;
+      Log::error("All query images can not be read.");
       return false;
     }
     else
-      cout << readImageCount << " query images were read." << endl;
-    cout << ">" << endl;
-  
+      Log::success(to_string(readImageCount) + " query images were read.");
+    
+    
     return true;
   }
-
+  
   bool DocumentDetector::warp (const cv::Mat& in, cv::Mat& out, Size size, vector<Point2f> points ) throw ( cv::Exception ){
     if ( points.size() !=4 )  throw cv::Exception ( 9001,"point.size()!=4","MarkerDetector::warp",__FILE__,__LINE__ );
     //obtain the perspective transform
     Point2f  pointsRes[4],pointsIn[4];
-
+    
     for ( int i=0;i<4;i++ ) pointsIn[i]=points[i];
-  
+    
     pointsRes[0]= ( Point2f ( 0,0 ) );
     pointsRes[1]= Point2f ( size.width-1,0 );
     pointsRes[2]= Point2f ( size.width-1,size.height-1 );
