@@ -47,6 +47,11 @@ namespace argosServer {
      */
     vector<Paper>&  update(cv::Mat&, bool&);
 
+
+
+    void checkRegion(cv::Mat& currentFrame,vector<Paper>& detectedPapers);
+    bool warp (const cv::Mat& in, cv::Mat& out, Size size, vector<Point2f> points ) throw ( cv::Exception );
+
   private:
     cv::Mat currentFrame;                 ///<  Current frame
     cv::Mat projectorFrame;               ///<  Projector openCV frame

@@ -3,12 +3,12 @@
   
   <paper_size width="21.0" height="29.7" />
   
-  <calibration_files camera="calibrationCamera.yml" projector="calibrationProjector.yml" extrinsics="CameraProjectorExtrinsics.yml" />
+  <calibration_files camera="calibrationCamera.xml" projector="calibrationProjector.xml" extrinsics="CameraProjectorExtrinsics.xml" />
 
   <argos_papers>
-    <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ags" descriptorFileName="neobiz.jpg" />
-    <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ags" descriptorFileName="sinovo.jpg" />
-    <paper id="2" description="Active" scriptFileName="ActiveScript.ags" descriptorFileName="active.jpg" />
+    <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ags" descriptorFileName="neobiz-.jpg" />
+    <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ags" descriptorFileName="sinovo-.jpg" />
+    <paper id="2" description="Active" scriptFileName="ActiveScript.ags" descriptorFileName="active-.jpg" />
   </argos_papers>
   
   <output_display type="projector" />
