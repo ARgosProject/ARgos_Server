@@ -6,9 +6,9 @@
   <calibration_files camera="calibrationCamera.xml" projector="calibrationProjector.xml" extrinsics="CameraProjectorExtrinsics.xml" />
 
   <argos_papers>
-    <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ags" descriptorFileName="neobiz-.jpg" />
-    <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ags" descriptorFileName="sinovo-.jpg" />
-    <paper id="2" description="Active" scriptFileName="ActiveScript.ags" descriptorFileName="active-.jpg" />
+    <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ars" descriptorFileName="neobiz-.jpg" />
+    <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ars" descriptorFileName="sinovo-.jpg" />
+    <paper id="2" description="Active" scriptFileName="ActiveScript.ars" descriptorFileName="active-.jpg" />
   </argos_papers>
   
   <output_display type="projector" />

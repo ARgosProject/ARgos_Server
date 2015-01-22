@@ -29,20 +29,22 @@ namespace argosServer {
       _scripts.clear();
 
     const std::vector<std::string>& script_file_names = ConfigManager::getScriptsList();
+    size_t size = script_file_names.size();
 
-    for(auto& script_file_name : script_file_names) {
-      Log::info("Loading script '" + script_file_name + "' from '" + path + script_file_name + "'");
+    for(int i = 0; i < size; ++i) {
+      Log::info("Loading script '" + script_file_names[i] + "' from '" + path + script_file_names[i] + "'");
 
       Script* script = new Script(*this);
-      script->setProperty("filename", script_file_name);
-      int num_lines = script->load(path + script_file_name);
+      script->setProperty("id", std::to_string(i));
+      script->setProperty("filename", script_file_names[i]);
+      int num_lines = script->load(path + script_file_names[i]);
 
       if(num_lines > 0)
-        Log::success("Loaded " + std::to_string(num_lines) + " sentences from script '" + script_file_name + "'");
+        Log::success("Loaded " + std::to_string(num_lines) + " sentences from script '" + script_file_names[i] + "'");
       else
-        Log::error("Loaded " + std::to_string(num_lines) + " sentences from script '" + script_file_name + "'");
+        Log::error("Loaded " + std::to_string(num_lines) + " sentences from script '" + script_file_names[i] + "'");
 
-      _scripts[script_file_name] = script;
+      _scripts[script_file_names[i]] = script;
     }
   }
 

@@ -26,9 +26,9 @@ namespace argosServer{
     tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
     while(1) {
-      Log::info("Servidor ARgos escuchando en " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
+      Log::info("Server listening at " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
       a.accept(*_tcpSocket);
-      Log::success("Nueva conexión de " + _tcpSocket->remote_endpoint().address().to_string());
+      Log::success("New connection from " + _tcpSocket->remote_endpoint().address().to_string());
       receive();
     }
   }
@@ -61,7 +61,7 @@ namespace argosServer{
     }
 
     if(ip == "0.0.0.0") {
-      Log::error("Interfaz de red " + iface + " no encontrada");
+      Log::error("Network interface " + iface + " not found.");
     }
 
     freeifaddrs(ifaddr);
@@ -109,7 +109,7 @@ namespace argosServer{
 
         if(initVideoConference) {
           if(_threadDone) {
-            Log::video("Nueva videoconferencia iniciada");
+            Log::video("New videostream started.");
             _threadDone = false;
             _videoThread.reset();
             _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this, st);
@@ -123,7 +123,7 @@ namespace argosServer{
         }
       }
       catch(boost::system::system_error const& e) {
-        Log::error("Se perdió la conexión del cliente. " + std::string(e.what()));
+        Log::error("Connection lost with the  client. " + std::string(e.what()));
         _tcpSocket->close();
         break;
       }
@@ -133,7 +133,7 @@ namespace argosServer{
   void Communicator::startVideoStream(StreamType st) {
     const std::string ip = _tcpSocket->remote_endpoint().address().to_string();
     const std::string port("9999");
-    Log::video("Enviando video a " + ip + ":" + port);
+    Log::video("Sending video to " + ip + ":" + port);
 
     const string videoStream = "Video Stream";
 
@@ -152,7 +152,7 @@ namespace argosServer{
     //cam.set(CV_CAP_PROP_GAIN, 55);
 
     if(!cam.isOpened()) {
-      Log::error("No se detectó ninguna cámara.");
+      Log::error("No camera detected.");
       return;
     }
 
@@ -223,29 +223,27 @@ namespace argosServer{
   }
 
   void Communicator::processMatrix16f(StreamType& st) {
-    Log::success("Nueva matriz de 16 float recibida. Size: " + std::to_string(st.size));
+    Log::success("New 16 floats matrix received. Size: " + std::to_string(st.size));
 
     int num_floats = st.size/sizeof(float);
     float tmp[num_floats];
     memcpy(&tmp[0], &st.data[0], sizeof(float)*(num_floats));
 
     // Procesar matriz (tmp) aquí
-
   }
 
   void Communicator::processVectori(StreamType& st) {
-    Log::success("Nuevo std::vector<int> recibido. Size: " + std::to_string(st.size));
+    Log::success("New std::vector<int> received. Size: " + std::to_string(st.size));
 
     int num_ints = st.size/sizeof(int);
     std::vector<int> tmp(num_ints);
     memcpy(&tmp[0], &st.data[0], sizeof(int)*(num_ints));
 
     // Procesar vector (tmp) aquí
-
   }
 
   void Communicator::processCvMat(StreamType& st) {
-    //Log::success("Nueva cv::Mat recibida. Size: " + std::to_string(st.size));
+    Log::success("New cv::Mat received. Size: " + std::to_string(st.size));
 
     //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
     cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
@@ -264,9 +262,9 @@ namespace argosServer{
 
   int Communicator::send() const {
     int buff_size = _buff.size();
-    //Log::info("Intentando enviar " + std::to_string(buff_size) + " bytes...");
+    Log::info("Sending " + std::to_string(buff_size) + " bytes...");
     int bytes = boost::asio::write(*_tcpSocket, boost::asio::buffer(_buff, buff_size));
-    //Log::success(std::to_string(bytes) + " bytes enviados.");
+    Log::success(std::to_string(bytes) + " bytes sent.");
 
     return bytes;
   }
@@ -335,6 +333,8 @@ namespace argosServer{
     addInt(size);
     addInt(paper.getId());
     addMatrix16f(modelview_matrix);
+    //addInt(5);
+    // TODO: Rellenar info de CallingFunctions
   }
 
   void Communicator::addVectorCvMat(const std::vector<cv::Mat>& mats) {
