@@ -19,7 +19,15 @@ namespace argosServer{
     createDetectorDescriptorMatcher();
 
     queryImagesNames = ConfigManager::getDescriptorsList();
+  }
 
+  DocumentDetector::~DocumentDetector(){}
+
+  void DocumentDetector::setImagesPath(const string& path) {
+    imagesPath = path;
+  }
+
+  void DocumentDetector::configure() {
     // Read query images
     readImages();
 
@@ -41,14 +49,7 @@ namespace argosServer{
       fs.release();
       cout << ">" << endl;
     */
-
-  }
-  DocumentDetector::~DocumentDetector(){}
-
-
-  void DocumentDetector::setImagesPath(const string& path) {
-    imagesPath = path;
-  }
+}
 
   /**
    * Main detection function. Performs all steps

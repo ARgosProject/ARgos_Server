@@ -48,6 +48,8 @@ namespace argosServer{
      */
     void setImagesPath(const string& path);
 
+    void configure();
+
     /**
      * Identify the content of a vector of papers
      * @param trainFrame Camera frame

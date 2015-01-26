@@ -51,6 +51,7 @@ namespace argosServer{
 
     // Document detector initialization
     DocumentDetector::getInstance().setImagesPath("data/templates/");
+    DocumentDetector::getInstance().configure();
 
     // Hand and finger detector initialization
     //HandDetector::getInstance();
