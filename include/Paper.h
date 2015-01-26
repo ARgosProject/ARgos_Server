@@ -15,37 +15,37 @@ namespace argosServer{
  *\brief This class represents a sheet of paper. It is a vector of the fours corners of the paper
  *
  */
-  
+
   class Paper: public vector<cv::Point2f> {
   public:
     /**
      * Default Constructor
      */
     Paper();
-  
+
     /**
-     * 
+     *
      */
     Paper(cv::Size size);
     /**
-     * 
+     *
      */
     Paper(const Paper &P);
     /**
      *
      */
     Paper(const vector<cv::Point2f> &corners);
-  
+
     /**
      * Default Destructor
      */
     ~Paper() {}
-   
-  
+
+
     cv::Size getPaperSize() const{
       return paperSize;
     }
-  
+
     cv::Mat getRotVec() const{
       return rotVec;
     }
@@ -57,7 +57,7 @@ namespace argosServer{
     void setRotVec(cv::Mat &rot) const{
       rot.copyTo(rotVec);
     }
-  
+
     void setTransVec(cv::Mat &trans) const{
       trans.copyTo(transVec);
     }
@@ -69,22 +69,22 @@ namespace argosServer{
     int getId() const{
       return id;
     }
-  
+
     void setId(int number){
       id = number;
     }
-  
+
     /**
      * Indicates if this object is valid
      */
-    bool isValid() const{ 
+    bool isValid() const{
       return size() == 4;}
-  
+
     /**
      *Draws this paper in the input image
      */
     void draw(cv::Mat &in, cv::Scalar color, int lineWidth=1, bool writeId=true)const;
-  
+
     /**
      * Returns the centroid of the paper
      */
@@ -114,16 +114,19 @@ namespace argosServer{
     //void calculateExtrinsics(cv::Size paperSizeMeters, cv::Mat camMatrix, cv::Mat distCoeff, bool setYPerperdicular) throw(cv::Exception);
     /**
      */
+
     friend ostream& operator<<(ostream &str, const Paper &P){
       for (int i=0; i<4; i++)
-	str<<"("<<P[i].x<< ","<<P[i].y<<") ";
+        str<<"("<<P[i].x<< ","<<P[i].y<<") ";
+
       str<<"Rxyz=";
       for (int i=0; i<3; i++)
-	str<<P.getRotVec().ptr<float>(0)[i]<<" ";
+        str<<P.getRotVec().ptr<float>(0)[i]<<" ";
+
       str<<"Txyz=";
       for (int i=0;i<3;i++)
-	str<<P.getTransVec().ptr<float>(0)[i]<<" ";
-    
+        str<<P.getTransVec().ptr<float>(0)[i]<<" ";
+
       return str;
     }
 

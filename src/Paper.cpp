@@ -67,7 +67,7 @@ namespace argosServer{
     float para[3][4];
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
-	para[i][j] = rot3x3.at<float>(i,j);
+        para[i][j] = rot3x3.at<float>(i,j);
 
     //now, add the translation
     para[0][3] = transVec.at<float>(0,0);
@@ -117,8 +117,8 @@ namespace argosServer{
       //determine the centroid
       Point cent(0,0);
       for (int i=0; i<4; i++){
-	cent.x+=(*this)[i].x;
-	cent.y+=(*this)[i].y;
+        cent.x+=(*this)[i].x;
+        cent.y+=(*this)[i].y;
       }
       cent.x/= 4.;
       cent.y/= 4.;
@@ -149,23 +149,23 @@ namespace argosServer{
 
     float halfWidthSize  =  paperSizeMeters.width/2.;
     float halfHeightSize =  paperSizeMeters.height/2.;
-  
+
     double  distance_0_1 = cv::norm( (*this)[0] - (*this)[1] );
     double  distance_1_2 = cv::norm( (*this)[1] - (*this)[2] );
     double  distance_2_3 = cv::norm( (*this)[2] - (*this)[3] );
     double  distance_3_0 = cv::norm( (*this)[3] - (*this)[0] );
 
-  
+
     //cout << "distance_0_1: "<<  distance_0_1 << endl;
     //cout << "distance_1_2: "<<  distance_1_2 << endl;
     //cout << "distance_2_3: "<<  distance_2_3 << endl;
     //cout << "distance_3_0: "<<  distance_3_0 << endl;
-  
+
     //cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
     //cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
-  
-    cv::Mat ObjPoints(4,3,CV_32FC1);  
-  
+
+    cv::Mat ObjPoints(4,3,CV_32FC1);
+
     ObjPoints.at<float>(0,0)=-halfWidthSize;
     ObjPoints.at<float>(0,1)=-halfHeightSize;
     ObjPoints.at<float>(0,2)=0;
@@ -177,16 +177,16 @@ namespace argosServer{
     ObjPoints.at<float>(2,2)=0;
     ObjPoints.at<float>(3,0)=-halfWidthSize;
     ObjPoints.at<float>(3,1)=halfHeightSize;
-    ObjPoints.at<float>(3,2)=0;  
- 
+    ObjPoints.at<float>(3,2)=0;
+
     cv::Mat ImagePoints(4,2,CV_32FC1);
-  
+
     //Set image points from the marker
-  
+
     if( (distance_0_1 + distance_2_3) < (distance_1_2 + distance_3_0) ){
       for (int c=0;c<4;c++){
-	ImagePoints.at<float>(c,0) = ((*this)[c%4].x);
-	ImagePoints.at<float>(c,1) = ((*this)[c%4].y);
+        ImagePoints.at<float>(c,0) = ((*this)[c%4].x);
+        ImagePoints.at<float>(c,1) = ((*this)[c%4].y);
       }
     }
     else{
@@ -199,30 +199,30 @@ namespace argosServer{
       ImagePoints.at<float>(3,0) = ((*this)[2].x);
       ImagePoints.at<float>(3,1) = ((*this)[2].y);
     }
-  
+
     cv::Mat camMatrix = camera.getDistortedCamMatrix();
     cv::Mat distCoeff = camera.getDistCoeffs();
     cv::Mat raux,taux;
     cv::solvePnP(ObjPoints, ImagePoints, camMatrix, distCoeff,raux,taux);
-  
+
     paperSize.width = paperSizeMeters.width;
     paperSize.height = paperSizeMeters.height;
-  
+
 
     cv::Mat rotObjToProj, transObjToProj;
-  
+
     cv::composeRT(raux, taux,
-		  cameraProjector.getCamToProjRotation(), cameraProjector.getCamToProjTranslation(),
-		  rotObjToProj, transObjToProj);
+                  cameraProjector.getCamToProjRotation(), cameraProjector.getCamToProjTranslation(),
+                  rotObjToProj, transObjToProj);
 
     //vector<cv::Point2f> out;
-  
+
     //cv::projectPoints(cv::Mat(ObjPoints),
     //	rotObjToProj, transObjToProj,
     //		projector.getDistortedIntrinsics().getCameraMatrix(),
     //		projector.getDistCoeffs(),
     //		out);
-  
+
     //calibrationProjector.setCandidateImagePoints(out);
 
     rotObjToProj.convertTo(rotVec,CV_32F);
@@ -248,7 +248,7 @@ namespace argosServer{
 
     float halfWidthSize  =  paperSizeMeters.width/2.;
     float halfHeightSize =  paperSizeMeters.height/2.;
-  
+
     double  distance_0_1 = cv::norm( (*this)[0] - (*this)[1] );
     double  distance_1_2 = cv::norm( (*this)[1] - (*this)[2] );
     double  distance_2_3 = cv::norm( (*this)[2] - (*this)[3] );
@@ -259,11 +259,11 @@ namespace argosServer{
     //cout << "distance_1_2: "<<  distance_1_2 << endl;
     //cout << "distance_2_3: "<<  distance_2_3 << endl;
     //cout << "distance_3_0: "<<  distance_3_0 << endl;
-  
+
     //cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
     //cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
-  
-    cv::Mat ObjPoints(4,3,CV_32FC1);  
+
+    cv::Mat ObjPoints(4,3,CV_32FC1);
 
     ObjPoints.at<float>(0,0)=-halfWidthSize;
     ObjPoints.at<float>(0,1)=-halfHeightSize;
@@ -276,16 +276,16 @@ namespace argosServer{
     ObjPoints.at<float>(2,2)=0;
     ObjPoints.at<float>(3,0)=-halfWidthSize;
     ObjPoints.at<float>(3,1)=halfHeightSize;
-    ObjPoints.at<float>(3,2)=0;  
- 
+    ObjPoints.at<float>(3,2)=0;
+
     cv::Mat ImagePoints(4,2,CV_32FC1);
-  
+
     //Set image points from the marker
-  
+
     if( (distance_0_1 + distance_2_3) < (distance_1_2 + distance_3_0) ){
       for (int c=0;c<4;c++){
-	ImagePoints.at<float>(c,0) = ((*this)[c%4].x);
-	ImagePoints.at<float>(c,1) = ((*this)[c%4].y);
+        ImagePoints.at<float>(c,0) = ((*this)[c%4].x);
+        ImagePoints.at<float>(c,1) = ((*this)[c%4].y);
       }
     }
     else{
@@ -304,7 +304,7 @@ namespace argosServer{
     cv::Mat raux,taux;
     cv::solvePnP(ObjPoints, ImagePoints, camMatrix, distCoeff,raux,taux);
     raux.convertTo(rotVec,CV_32F);
-    taux.convertTo(transVec ,CV_32F);
+    taux.convertTo(transVec,CV_32F);
 
     //rotate the X axis so that Y is perpendicular to the marker plane
     if (setYPerperdicular)
@@ -312,7 +312,7 @@ namespace argosServer{
 
     paperSize.width = paperSizeMeters.width;
     paperSize.height = paperSizeMeters.height;
-    cout<<(*this)<<endl;
+    //cout<<(*this)<<endl;
   }
 
   /**

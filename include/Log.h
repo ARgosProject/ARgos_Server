@@ -4,8 +4,11 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 namespace argosServer {
+
+  class Paper;
 
   /**
    * A utility class for logging
@@ -20,6 +23,7 @@ namespace argosServer {
      */
     enum Colour {
       FG_DEFAULT          = 39,
+
       FG_BLACK            = 30,
       FG_RED              = 31,
       FG_GREEN            = 32,
@@ -48,43 +52,51 @@ namespace argosServer {
      * Logs a message using simple output, i.e. no colours
      * @param msg The message to output
      */
-    static void plain(const std::string& msg);
+    static void plain(const std::string& msg, const std::string& filename = "");
 
     /**
      * Logs an info message (blue)
      * @param msg The message to output
      */
-    static void info(const std::string& msg);
+    static void info(const std::string& msg, const std::string& filename = "");
 
     /**
      * Logs an error message (red)
      * @param msg The message to output
      */
-    static void error(const std::string& msg);
+    static void error(const std::string& msg, const std::string& filename = "");
 
     /**
      * Logs a success message (green)
      * @param msg The message to output
      */
-    static void success(const std::string& msg);
+    static void success(const std::string& msg, const std::string& filename = "");
 
     /**
      * Logs a video message (yellow)
      * @param msg The message to output
      */
-    static void video(const std::string& msg);
+    static void video(const std::string& msg, const std::string& filename = "");
+
+    /**
+     * Logs a paper (gray)
+     * @param msg The message to output
+     */
+    static void paper(const Paper& paper, const std::string& filename = "");
 
     /**
      * Logs a templated std::vector
      * @param vec The vector to log
      */
-    template<typename T> static void vector(const std::vector<T>& vec);
+    template<typename T> static void vector(const std::vector<T>& vec, Colour color = Colour::FG_DEFAULT,
+                                            const std::string& filename = "");
 
     /**
      * Logs a templated plain 16 items array as a matrix
      * @param matrix The matrix to log
      */
-    template<typename T> static void matrix(const T* matrix);
+    template<typename T> static void matrix(const T* matrix, Colour color = Colour::FG_DEFAULT,
+                                            const std::string& filename = "");
 
     /**
      * Retrieves the current date and time
@@ -104,20 +116,55 @@ namespace argosServer {
   };
 
   template<typename T>
-  void Log::vector(const std::vector<T>& vec) {
-    std::cout << currentDateTime() << " [ ";
+  void Log::vector(const std::vector<T>& vec, Colour color, const std::string& filename) {
+    if(coloured_output)
+      std::cout << "\033[" << color << "m";
+
+    std::cout << currentDateTime() << " [VECTOR] \n";
+    std::cout << "                      [";
     typename std::vector<T>::const_iterator i;
     for(i = vec.begin(); i != vec.end(); ++i)
       std::cout << *i << ' ';
-    std::cout << "] " << std::endl;
+    std::cout << "]" << std::endl;
+
+    if(coloured_output)
+      std::cout << "\033[" << Colour::FG_DEFAULT << "m";
+
+    if(!filename.empty()) {
+      std::ofstream ofs(filename, std::ofstream::app);
+      ofs << currentDateTime() << " [VECTOR] \n";
+      ofs << "                      [";
+      for(i = vec.begin(); i != vec.end(); ++i)
+        ofs << *i << ' ';
+      ofs << "]" << std::endl;
+      ofs.close();
+    }
   }
 
   template<typename T>
-  void Log::matrix(const T* matrix) {
+  void Log::matrix(const T* matrix, Colour color, const std::string& filename) {
+    if(coloured_output)
+      std::cout << "\033[" << color << "m";
+
+    std::cout << currentDateTime() << " [MATRIX] \n";
     for(int i = 0; i < 16; i += 4) {
-      std::cout << currentDateTime() << " [ ";
+      std::cout << "                      [";
       std::cout << matrix[i] << " " << matrix[i+1] << " " << matrix[i+2] << " " << matrix[i+3];
-      std::cout << "] " << std::endl;
+      std::cout << "]" << std::endl;
+    }
+
+    if(coloured_output)
+      std::cout << "\033[" << Colour::FG_DEFAULT << "m";
+
+    if(!filename.empty()) {
+      std::ofstream ofs(filename, std::ofstream::app);
+      ofs << currentDateTime() << " [MATRIX] \n";
+      for(int i = 0; i < 16; i += 4) {
+        ofs << "                      [";
+        ofs << matrix[i] << " " << matrix[i+1] << " " << matrix[i+2] << " " << matrix[i+3];
+        ofs << "]" << std::endl;
+      }
+      ofs.close();
     }
   }
 

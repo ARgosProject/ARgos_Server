@@ -22,7 +22,7 @@ namespace argosServer{
       delete _tcpSocket;
   }
 
-  void Communicator::waitForConnections() {
+  void Communicator::run() {
     tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
     while(1) {
@@ -327,7 +327,7 @@ namespace argosServer{
     int type = Type::PAPER;
     memcpy(sMatrix, modelview_matrix, size);
 
-    Log::matrix(modelview_matrix);
+    Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
 
     addInt(type);
     addInt(size);

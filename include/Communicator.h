@@ -25,7 +25,8 @@ using boost::asio::ip::udp;
 
 namespace argosServer{
   /**
-   * A class used to communicate with the client It provides bidirectional communication with the client, allowing to receive and send some data structures
+   * A class used to communicate with the client
+   * It provides bidirectional communication with the client, allowing to receive and send some data structures
    */
   class Communicator {
   public:
@@ -50,7 +51,7 @@ namespace argosServer{
     explicit Communicator(unsigned short port, const char* iface);
     ~Communicator();
 
-    void waitForConnections();
+    void run();
     std::string getIpFromInterface(const std::string& iface);
 
     void readStreamTypeFromSocket(tcp::socket &socket, StreamType &st);

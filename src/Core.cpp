@@ -13,7 +13,10 @@ namespace argosServer{
 
     //- Camera & Projector Parameters ----
     Log::info("Loading camera & projector parameters... ");
-    cameraProjector.load(ConfigManager::getCameraCalibration(),ConfigManager::getProjectorCalibration(), ConfigManager::getExtrinsics());
+    cameraProjector.setCalibrationsPath("data/calibrations/");
+    cameraProjector.load(ConfigManager::getCameraCalibration(),
+                         ConfigManager::getProjectorCalibration(),
+                         ConfigManager::getExtrinsics());
 
     if(!cameraProjector.isValid()){
       Log::error("Camera or projector parameters is not set, need to run the calibrator tool");
@@ -24,7 +27,7 @@ namespace argosServer{
 
 
     //- Script loading
-    ScriptManager::getInstance().loadScripts("data/");
+    ScriptManager::getInstance().loadScripts("data/scripts/");
 
     // background
     //background = imread("background_distorted.jpg", CV_LOAD_IMAGE_COLOR );
@@ -47,8 +50,7 @@ namespace argosServer{
     PaperDetector::getInstance();
 
     // Document detector initialization
-    DocumentDetector::getInstance();
-
+    DocumentDetector::getInstance().setImagesPath("data/templates/");
 
     // Hand and finger detector initialization
     //HandDetector::getInstance();
@@ -64,7 +66,7 @@ namespace argosServer{
   Core::~Core(){}
 
   /*
-  vector<Paper> Core::processCvMat(cv::Mat& currentFrame){
+    vector<Paper> Core::processCvMat(cv::Mat& currentFrame){
 
     numFrames++;
     //bg_out.copyTo(projectorFrame);
@@ -94,27 +96,27 @@ namespace argosServer{
 
     //else{
     if (paperList.size() == 0 ){
-      //cout << "Detecting NONE" << endl;
-      isPreviousPaperDetected = false;
-      previousNumInvoices = 0;
-      numFrames = 0;
+    //cout << "Detecting NONE" << endl;
+    isPreviousPaperDetected = false;
+    previousNumInvoices = 0;
+    numFrames = 0;
     }
     else{
-      if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
-        isPreviousPaperDetected = true;
-        numFrames = 0;
-        previousNumInvoices = numInvoices;
+    if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
+    isPreviousPaperDetected = true;
+    numFrames = 0;
+    previousNumInvoices = numInvoices;
 
-        DocumentDetector::getInstance().detect(currentFrame,paperList);
+    DocumentDetector::getInstance().detect(currentFrame,paperList);
 
-        invoicesIndex.clear();
-        //cout <<  "invoicesIndex clear "<< endl;
-        for (unsigned int i=0; i<paperList.size(); i++){
-          //if (paperList[i].getId() == 999) initVideoConference = true;
-          invoicesIndex.push_back(paperList[i].getId());
-          //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
-        }
-      }
+    invoicesIndex.clear();
+    //cout <<  "invoicesIndex clear "<< endl;
+    for (unsigned int i=0; i<paperList.size(); i++){
+    //if (paperList[i].getId() == 999) initVideoConference = true;
+    invoicesIndex.push_back(paperList[i].getId());
+    //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+    }
+    }
     }
     //}
     //for (unsigned int i=0; i<paperList.size(); i++){
@@ -148,7 +150,7 @@ namespace argosServer{
     //addCvMat(def);
     return paperList;
 
-  }
+    }
   */
 
   vector<Paper>& Core::update(cv::Mat& currentFrame, bool &initVideoConference){
@@ -156,7 +158,9 @@ namespace argosServer{
     numFrames++;
 
     //Detection of papers in the image passed
-    PaperDetector::getInstance().detect(currentFrame,paperList, cameraProjector, ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay);
+    PaperDetector::getInstance().detect(currentFrame, paperList, cameraProjector,
+                                        ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay);
+    Log::paper(paperList.back());
 
     //cv::Point fingerPoint;
     //HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
@@ -171,72 +175,72 @@ namespace argosServer{
 
 
     /* Funcionalidad Anterior
-    if (initVideoConference){
-      if ( paperList.size() == 0)
-        initVideoConference = false;
-    }
+       if (initVideoConference){
+       if ( paperList.size() == 0)
+       initVideoConference = false;
+       }
 
-    else{
-      if (paperList.size() == 0 ){
-        //cout << "Detecting NONE" << endl;
-        isPreviousPaperDetected = false;
-        previousNumInvoices = 0;
-        numFrames = 0;
-      }
-      else{
-        if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
-          isPreviousPaperDetected = true;
-          numFrames = 0;
-          previousNumInvoices = numInvoices;
+       else{
+       if (paperList.size() == 0 ){
+       //cout << "Detecting NONE" << endl;
+       isPreviousPaperDetected = false;
+       previousNumInvoices = 0;
+       numFrames = 0;
+       }
+       else{
+       if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
+       isPreviousPaperDetected = true;
+       numFrames = 0;
+       previousNumInvoices = numInvoices;
 
-          DocumentDetector::getInstance().detect(currentFrame,paperList);
+       DocumentDetector::getInstance().detect(currentFrame,paperList);
 
-          invoicesIndex.clear();
-          //cout <<  "invoicesIndex clear "<< endl;
-          for (unsigned int i=0; i<paperList.size(); i++){
-            initVideoConference = (paperList[i].getId() == 999);
-            invoicesIndex.push_back(paperList[i].getId());
-            //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
-          }
-        }
-      }
-    }
+       invoicesIndex.clear();
+       //cout <<  "invoicesIndex clear "<< endl;
+       for (unsigned int i=0; i<paperList.size(); i++){
+       initVideoConference = (paperList[i].getId() == 999);
+       invoicesIndex.push_back(paperList[i].getId());
+       //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+       }
+       }
+       }
+       }
 
-    for (unsigned int i=0; i<paperList.size(); i++){
-      Log::info(std::to_string(invoicesIndex[i]));
-      paperList[i].setId(invoicesIndex[i]);
-    }
+       for (unsigned int i=0; i<paperList.size(); i++){
+       Log::info(std::to_string(invoicesIndex[i]));
+       paperList[i].setId(invoicesIndex[i]);
+       }
     */
 
     /*
-    if (paperList.size() == 0 ){
+      if (paperList.size() == 0 ){
       //cout << "Detecting NONE" << endl;
       isPreviousPaperDetected = false;
       previousNumInvoices = 0;
       numFrames = 0;
-    }
-    else{
-      if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
-  isPreviousPaperDetected = true;
-  numFrames = 0;
-  previousNumInvoices = numInvoices;
-
-  DocumentDetector::getInstance().detect(currentFrame,paperList);
-
-  invoicesIndex.clear();
-  //cout <<  "invoicesIndex clear "<< endl;
-  for (unsigned int i=0; i<paperList.size(); i++){
-    //initVideoConference = (paperList[i].getId() == 999);
-    invoicesIndex.push_back(paperList[i].getId());
-    //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
-  }
       }
-    }
+      else{
+      if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
+      isPreviousPaperDetected = true;
+      numFrames = 0;
+      previousNumInvoices = numInvoices;
 
-    for (unsigned int i=0; i<paperList.size(); i++){
+      DocumentDetector::getInstance().detect(currentFrame,paperList);
+
+      invoicesIndex.clear();
+      //cout <<  "invoicesIndex clear "<< endl;
+      for (unsigned int i=0; i<paperList.size(); i++){
+      //initVideoConference = (paperList[i].getId() == 999);
+      invoicesIndex.push_back(paperList[i].getId());
+      //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+      }
+      }
+      }
+
+      for (unsigned int i=0; i<paperList.size(); i++){
       Log::info(std::to_string(invoicesIndex[i]));
       paperList[i].setId(invoicesIndex[i]);
-    }
+      }
     */
     return paperList;
 

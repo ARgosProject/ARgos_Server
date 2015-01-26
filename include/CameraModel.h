@@ -14,105 +14,105 @@ using namespace std;
 
 namespace argosServer{
   /**
-   * The intrinsic parameters defines the internal geometry and optics of the camera. 
-   * 
-   */ 
+   * The intrinsic parameters defines the internal geometry and optics of the camera.
+   *
+   */
   class Intrinsics{
   public:
-    
+
     /**
      * Default constructor
-     */ 
+     */
     Intrinsics();
-    
+
     /**
      * Constructor
-     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)   
+     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)
      * @param imageSize Image dimensions
-     */ 
+     */
     Intrinsics(cv::Mat cameraMatrix, cv::Size imageSize);
     /**
-     * Constructor 
-     * @param intrinsics Use the instrinsics parameters to create the new object   
-     */ 
+     * Constructor
+     * @param intrinsics Use the instrinsics parameters to create the new object
+     */
     Intrinsics(const Intrinsics& intrinsics);
-    
+
     /**
-     * Configures a Intrinsics object 
-     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)   
+     * Configures a Intrinsics object
+     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)
      * @param imageSize Image dimensions
-     */ 
-    void setup(cv::Mat cameraMatrix, cv::Size imageSize);  
-    
+     */
+    void setup(cv::Mat cameraMatrix, cv::Size imageSize);
+
     /**
-     * Configures a Intrinsics object 
-     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)   
+     * Configures a Intrinsics object
+     * @param cameraMatrix 3x3 intrinsics matrix parameters (fx 0 cx, 0 fy cy, 0 0 1)
      * @param imageSize Image dimensions
      * @param sensorSize Sensor dimensions
-     */ 
-    void setup(cv::Mat cameraMatrix, cv::Size imageSize, cv::Size sensorSize);  
-    
+     */
+    void setup(cv::Mat cameraMatrix, cv::Size imageSize, cv::Size sensorSize);
+
     /**
      * Sets image dimensions
      * @param imgSize Image dimensions
-     */ 
+     */
     void setImageSize(cv::Size imgSize);
-    
+
     /**
      * Gets camera matrix
      * @return 3x3 cv::Mat matrix
-     */ 
+     */
     cv::Mat getCameraMatrix() const;
 
     /**
      * Gets image dimensions
-     * @return cv::Size(width,height) 
-     */ 
+     * @return cv::Size(width,height)
+     */
     cv::Size getImageSize() const;
-    
+
     /**
      * Gets sensor dimensions
-     * @return cv::Size(width,height) 
-     */ 
+     * @return cv::Size(width,height)
+     */
     cv::Size getSensorSize() const;
 
     /**
      * Gets field of view
      * @return cv::Point2d(x,y)
-     */ 
+     */
     cv::Point2d getFov() const;
-    
+
     /**
      * Gets focal length
-     * @return double 
-     */ 
+     * @return double
+     */
     double getFocalLength() const;
-    
+
     /**
      * Gets aspect ratio
-     */ 
+     */
     double getAspectRatio() const;
-    
+
     /**
      * Gets principal point (center)
-     */ 
+     */
     cv::Point2d getPrincipalPoint() const;
-    
+
     /**
      * Sets new image dimensions
      * @param size Image dimensions
-     */ 
+     */
     void resize(cv::Size size)throw(cv::Exception);
-    
+
     /**
      * Checks if the object has valid parameters
-     */ 
+     */
     bool isValid() const {
       return cameraMatrix.rows != 0 && cameraMatrix.cols != 0  && imageSize.width != -1 && imageSize.height != -1;
     }
-    
+
   private:
-    cv::Mat cameraMatrix;             ///< 3x3 matrix (fx 0 cx, 0 fy cy, 0 0 1) 
+    cv::Mat cameraMatrix;             ///< 3x3 matrix (fx 0 cx, 0 fy cy, 0 0 1)
     cv::Size imageSize;               ///< Size of the image
     cv::Size sensorSize;              ///< Size of the image
     cv::Point2d fov;                  ///< Field of view
@@ -120,19 +120,19 @@ namespace argosServer{
     double aspectRatio;               ///< Aspect Ratio
     cv::Point2d principalPoint;       ///< Principal point (center)
   };
-  
-  
+
+
   /**
    * Defines the mathematical model of a camera
-   */ 
+   */
   class CameraModel{
-    
+
   public:
     /**
      * Default Constructor
      */
     CameraModel();
-    
+
     /**
      * Creates the object from the info passed
      * @param cameraMatrix 3x3 matrix (fx 0 cx, 0 fy cy, 0 0 1)
@@ -140,7 +140,7 @@ namespace argosServer{
      * @param imageSize Image size
      */
     CameraModel(cv::Mat cameraMatrix, cv::Mat distCoeffs, cv::Size imageSize);
-    
+
     /**
      * Copy constructor
      * @param camera CameraModel to copy
@@ -158,31 +158,31 @@ namespace argosServer{
      * Gets distortion coeficients of camera
      */
     cv::Mat getDistCoeffs() const;
-  
+
     /**
-     * Configures distorted intrinsics parameters 
+     * Configures distorted intrinsics parameters
      * @param distortedIntrinsics Intrinsics parameters with distortion
-     * @param distortionCoefficients Distortion Coefficients 
-     */   
+     * @param distortionCoefficients Distortion Coefficients
+     */
     void setIntrinsics(Intrinsics& distortedIntrinsics, cv::Mat& distortionCoefficients);
-    
+
     /**
      * Gets distorted intrinsics parameters
      */
     const Intrinsics& getDistortedIntrinsics() const;
-    
+
     /**
      * Gets undistorted intrinsics parameters (for OpenGL)
      */
     const Intrinsics& getUndistortedIntrinsics() const;
-  
+
     /**
      * Gets distorted camera matrix
      */
     cv::Mat getDistortedCamMatrix() const{
       return distortedIntrinsics.getCameraMatrix();
     }
-    
+
     /**
      * Gets undistorted camera matrix
      */
@@ -194,7 +194,7 @@ namespace argosServer{
      * Returns the location of the camera in the reference system given by the rotation and translation vectors passed
      */
     static cv::Point3f getCameraLocation(cv::Mat Rvec,cv::Mat Tvec);
-    
+
     /**
      * Given the intrinsic camera parameters returns the GL_PROJECTION matrix for OpenGL.
      * Please NOTE that when using OpenGL, it is assumed no camera distorsion!
@@ -206,33 +206,33 @@ namespace argosServer{
      * @param invert: indicates if the output projection matrix has to yield a horizontally inverted image because image data has not been stored in the order of glDrawPixels: bottom-to-top.
      */
     void glGetProjectionMatrix( cv::Size orgImgSize, cv::Size size,float proj_matrix[16],float gnear,float gfar,bool invert=false) throw (cv::Exception);
-    
-    
+
+
     /**
      * Saves this to a file
      */
-    void saveFile(string filename) const throw(cv::Exception);
-  
+    void saveFile(const string& filename) const throw(cv::Exception);
+
     /**
      * Reads from a XML/YAML file generated with the camera model
      */
-    void loadFile(string filename) throw(cv::Exception); 
+    void loadFile(const string& filename) throw(cv::Exception);
 
-    
-  
+
+
   private:
     Intrinsics distortedIntrinsics;   ///< Principal intrinsics parameters
     Intrinsics undistortedIntrinsics; ///< Undistorted intrinsics parameters for OPENGL
     cv::Mat distCoeffs;               ///< 4x1 matrix distortion coefficients (k1,k2,p1,p2)
-    
-    cv::Mat __undistortMapX;          ///< Image transformation map fx(x,y)     
-    cv::Mat __undistortMapY;          ///< Image transformation map fy(x,y)     
+
+    cv::Mat __undistortMapX;          ///< Image transformation map fx(x,y)
+    cv::Mat __undistortMapY;          ///< Image transformation map fy(x,y)
 
     /**
      * Generates OpenGL projection matrix based on real camera parameter and user-specified far/near clip plane.
      */
     void argConvGLcpara2( float cparam[3][4], int width, int height, float gnear, float gfar, float m[16], bool invert)throw(cv::Exception);
-    
+
     /**
      * If the specified cparam includes translation and rotation components, this function divides it into perspective projection
      * component and translation/rotation components.
@@ -243,7 +243,7 @@ namespace argosServer{
      * Calculate the euclidean norm of (a,b,c) vector
      */
     float norm( float a, float b, float c );
-    
+
     /**
      * Returns dot product of (a1,a2,a3) and (b1,b2,b3) vectors
      */
@@ -262,7 +262,7 @@ namespace argosServer{
      * @param interpolationMode Interpolation method (a nearest-neighbor interpolation by default)
      */
     void undistort(const cv::Mat& src, cv::Mat& dst, int interpolationMode = cv::INTER_NEAREST);
-    
+
     /**
      * Computes and Update the undistortion and rectification transformation map.
      */
