@@ -50,11 +50,11 @@ namespace argosServer{
     enum CallingFunctionType {
       NONE                     = -1,
 
-      DRAW_IMAGE_FROM_FILE     =  0,
-      DRAW_VIDEO_FROM_FILE     =  1,
+      DRAW_IMAGE               =  0,
+      DRAW_VIDEO               =  1,
       DRAW_CORNERS             =  2,
       DRAW_AXIS                =  3,
-      NIT_VIDEO_STREAM         =  4,
+      INIT_VIDEO_STREAM        =  4,
       DRAW_TEXT_PANEL          =  5,
       DRAW_HIGHLIGHT           =  6,
       DRAW_BUTTON              =  7,
@@ -89,6 +89,7 @@ namespace argosServer{
 
     int send() const;
     size_t addInt(int val);
+    size_t addFloat(float val);
     size_t addChars(const char* chars, int num_chars);
     size_t addMatrix16f(const float* matrix);
     void addVectori(const std::vector<int>& vector);

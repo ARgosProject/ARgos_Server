@@ -1,5 +1,4 @@
 # Script para Neobiz
-#> DrawTextPanel 1 18 Active
-#> Wait 3
-> PlaySound ayudaVideoConferencia.wav 0
-#> CheckRegion 1 18 5 2
+> DrawCorners 3.0 3.0 1.0 0.0 0.0 21.0 29.7
+> DrawImage neobiz.jpg 5.64 -8.67 0.0 -1.0 1.0
+> PlaySound neobiz.wav 0

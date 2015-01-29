@@ -1,10 +1,22 @@
 #include "ScriptManager.h"
 #include "Script.h"
 #include "ScriptFunction.h"
-#include "WaitSF.h"
-#include "PlaySoundSF.h"
 #include "Log.h"
 #include "ConfigManager.h"
+
+#include "WaitSF.h"
+#include "DrawImageSF.h"
+#include "DrawVideoSF.h"
+#include "DrawCornersSF.h"
+#include "DrawAxisSF.h"
+#include "InitVideostreamSF.h"
+#include "DrawTextPanelSF.h"
+#include "DrawHighlightSF.h"
+#include "DrawButtonSF.h"
+#include "DrawFactureHintSF.h"
+#include "PlaySoundSF.h"
+#include "PlaySoundDelayedSF.h"
+#include "CheckRegionSF.h"
 
 namespace argosServer {
 
@@ -66,7 +78,18 @@ namespace argosServer {
 
   void ScriptManager::fillHandlers() {
     _handlers["Wait"] = new WaitSF;
+    _handlers["DrawImage"] = new DrawImageSF;
+    _handlers["DrawVideo"] = new DrawVideoSF;
+    _handlers["DrawCorners"] = new DrawCornersSF;
+    _handlers["DrawAxis"] = new DrawAxisSF;
+    _handlers["InitVideostream"] = new InitVideostreamSF;
+    _handlers["DrawTextPanel"] = new DrawTextPanelSF;
+    _handlers["DrawHighlight"] = new DrawHighlightSF;
+    _handlers["DrawButton"] = new DrawButtonSF;
+    _handlers["DrawFactureHint"] = new DrawFactureHintSF;
     _handlers["PlaySound"] = new PlaySoundSF;
+    _handlers["PlaySoundDelayed"] = new PlaySoundDelayedSF;
+    _handlers["CheckRegion"] = new CheckRegionSF;
   }
 
 }

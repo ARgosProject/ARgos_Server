@@ -282,6 +282,14 @@ namespace argosServer{
     return sizeof(int);
   }
 
+  size_t Communicator::addFloat(float val) {
+    unsigned char val_chars[sizeof(float)];
+    memcpy(val_chars, &val, sizeof(float));
+    _buff.insert(_buff.end(), &val_chars[0], &val_chars[sizeof(float)]);
+
+    return sizeof(float);
+  }
+
   size_t Communicator::addChars(const char* chars, int num_chars) {
     int size = num_chars * sizeof(char);
     unsigned char val_chars[size];

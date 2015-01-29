@@ -1,7 +1,4 @@
-# Script para Active
-
-> DrawTextPanel 1 18 Active
-> Wait 3
-
-> PlayAudio ActiveAudio 1
-> CheckRegion 1 18 5 2
+# Script para Neobiz
+> DrawCorners 3.0 3.0 0.0 1.0 0.0 21.0 29.7
+> DrawImage sinovo.jpg 5.64 -8.67 0.0 -1.0 1.0
+> PlaySound sinovo.wav 0
