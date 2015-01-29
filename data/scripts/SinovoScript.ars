@@ -1,5 +1,7 @@
 # Script para Active
+
 > DrawTextPanel 1 18 Active
 > Wait 3
+
 > PlayAudio ActiveAudio 1
 > CheckRegion 1 18 5 2

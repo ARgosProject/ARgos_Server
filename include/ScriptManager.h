@@ -21,15 +21,17 @@ namespace argosServer {
     ~ScriptManager();
 
     void loadScripts(const std::string& path);
-    void runScript(const std::string& file_name);
-    void update();
+    void runScript(int id);
+    //void update();
+
+    Script& getScript(int id);
 
   private:
     void fillHandlers();
 
   private:
     std::map<std::string, ScriptFunction*> _handlers;
-    std::map<std::string, Script*> _scripts;
+    std::map<int, Script*> _scripts;
   };
 
 }

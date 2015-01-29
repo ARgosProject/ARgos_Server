@@ -2,14 +2,19 @@
 #include "Paper.h"
 #include "Log.h"
 #include "Core.h"
+#include "ScriptManager.h"
+#include "Script.h"
+#include "ScriptSentence.h"
+#include "ScriptFunction.h"
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <ifaddrs.h>
+#include <iomanip>
 
 namespace argosServer{
 
-
-  Communicator::Communicator(unsigned short port, const char* iface) : _port(port), _iface(iface), _threadDone(true), _receive(false) {
+  Communicator::Communicator(unsigned short port, const char* iface)
+    : _port(port), _iface(iface), _threadDone(true), _receive(false) {
     _tcpSocket = new tcp::socket(_ioService);
 
     Core::getInstance();
@@ -123,7 +128,7 @@ namespace argosServer{
         }
       }
       catch(boost::system::system_error const& e) {
-        Log::error("Connection lost with the  client. " + std::string(e.what()));
+        Log::error("Connection lost with the client. " + std::string(e.what()));
         _tcpSocket->close();
         break;
       }
@@ -269,22 +274,30 @@ namespace argosServer{
     return bytes;
   }
 
-  void Communicator::addInt(int val) {
+  size_t Communicator::addInt(int val) {
     unsigned char val_chars[sizeof(int)];
     memcpy(val_chars, &val, sizeof(int));
     _buff.insert(_buff.end(), &val_chars[0], &val_chars[sizeof(int)]);
+
+    return sizeof(int);
   }
 
-  void Communicator::addMatrix16f(const float* matrix) {
+  size_t Communicator::addChars(const char* chars, int num_chars) {
+    int size = num_chars * sizeof(char);
+    unsigned char val_chars[size];
+    memcpy(val_chars, chars, size);
+    _buff.insert(_buff.end(), &val_chars[0], &val_chars[size]);
+
+    return size;
+  }
+
+  size_t Communicator::addMatrix16f(const float* matrix) {
     int size = 16 * sizeof(float);
     unsigned char sMatrix[size];
-    /*int type = Type::MATRIX_16F;
+    memcpy(sMatrix, &matrix[0], size);
+    _buff.insert(_buff.end(), &sMatrix[0], &sMatrix[size]);
 
-      addInt(type);
-      addInt(size);
-    */
-    memcpy(sMatrix, matrix, size);
-    _buff.insert(_buff.end(), &sMatrix[0], &sMatrix[size]);                // Datos
+    return size;
   }
 
   void Communicator::addVectori(const std::vector<int>& vector) {
@@ -296,7 +309,7 @@ namespace argosServer{
     addInt(type);
     addInt(size);
 
-    _buff.insert(_buff.end(), &sVector[0], &sVector[size]);                // Datos
+    _buff.insert(_buff.end(), &sVector[0], &sVector[size]);
   }
 
   void Communicator::addSkip() {
@@ -315,26 +328,64 @@ namespace argosServer{
     addInt(type);
     addInt(mat_buff.size());
 
-    _buff.insert(_buff.end(), mat_buff.begin(), mat_buff.end());           // Datos
+    _buff.insert(_buff.end(), mat_buff.begin(), mat_buff.end());
   }
 
   void Communicator::addPaper(Paper& paper) {
+    // Type
+    int type = Type::PAPER;
+
+    // Id
+    int id = paper.getId();
+
+    // Matrix
     float modelview_matrix[16];
     paper.glGetModelViewMatrix(modelview_matrix);
-
-    int size = (1 * sizeof(int)) + (16 * sizeof(float));
+    int size = 16 * sizeof(float);
     unsigned char sMatrix[size];
-    int type = Type::PAPER;
     memcpy(sMatrix, modelview_matrix, size);
-
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
 
-    addInt(type);
-    addInt(size);
-    addInt(paper.getId());
-    addMatrix16f(modelview_matrix);
-    //addInt(5);
-    // TODO: Rellenar info de CallingFunctions
+    // Script
+    Script& script = ScriptManager::getInstance().getScript(id);
+
+    size = 0;
+    addInt(type);                            // Type
+    addInt(-1);                              // Size placeholder
+    size += addInt(id);                      // Paper Id
+    size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
+    size += addScript(script, id);           // Paper script
+
+    // Real size
+    unsigned char val_chars[sizeof(int)];
+    memcpy(val_chars, &size, sizeof(int));
+    for(size_t i = 0; i < sizeof(int); ++i) {
+      _buff[sizeof(int) + i] = val_chars[i];
+    }
+  }
+
+  size_t Communicator::addScript(Script& script, int id) {
+    static int oldId = -2;
+    int size = 0;
+
+    std::vector<ScriptSentence>& sentences = script.getSentences();
+    int num_sentences = sentences.size();
+
+    if(id != oldId) {
+      size += addInt(num_sentences);
+    }
+    else {
+      size += addInt(0);
+    }
+
+    for(auto& sentence : sentences) {
+      sentence.execute(script, ScriptManager::getInstance(), *this);
+      size += std::stoi(sentence.getScriptFunction()->getProperty("bytes"));
+    }
+
+    oldId = id;
+
+    return size;
   }
 
   void Communicator::addVectorCvMat(const std::vector<cv::Mat>& mats) {

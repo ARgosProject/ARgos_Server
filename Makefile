@@ -6,7 +6,7 @@ DIRHEA := include/
 
 CXX := g++
 
-CXXFLAGS := -Wall -O2 -std=c++0x -MMD -MP
+CXXFLAGS := -Wall -O0 -ggdb -std=c++0x -MMD -MP
 CXXFLAGS += `pkg-config --cflags opencv`
 
 INCLUDES := -I$(DIRHEA)

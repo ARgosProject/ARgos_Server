@@ -24,6 +24,9 @@ using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 
 namespace argosServer{
+
+  class Script;
+
   /**
    * A class used to communicate with the client
    * It provides bidirectional communication with the client, allowing to receive and send some data structures
@@ -38,6 +41,27 @@ namespace argosServer{
       CV_MAT        =  2,
       PAPER         =  3,
       VIDEO_STREAM  =  4
+    };
+
+    /**
+     * An enum used to hold the function calls from the
+     * script engine
+     */
+    enum CallingFunctionType {
+      NONE                     = -1,
+
+      DRAW_IMAGE_FROM_FILE     =  0,
+      DRAW_VIDEO_FROM_FILE     =  1,
+      DRAW_CORNERS             =  2,
+      DRAW_AXIS                =  3,
+      NIT_VIDEO_STREAM         =  4,
+      DRAW_TEXT_PANEL          =  5,
+      DRAW_HIGHLIGHT           =  6,
+      DRAW_BUTTON              =  7,
+      DRAW_FACTURE_HINT        =  8,
+
+      PLAY_SOUND               =  9,
+      PLAY_SOUND_DELAYED       = 10
     };
 
   public:
@@ -64,16 +88,17 @@ namespace argosServer{
     size_t sendCvMatVideoStream(const cv::Mat& mat, udp::socket& udpSocket, const udp::endpoint& udpEndpoint);
 
     int send() const;
-    void addInt(int val);
-    void addMatrix16f(const float* matrix);
+    size_t addInt(int val);
+    size_t addChars(const char* chars, int num_chars);
+    size_t addMatrix16f(const float* matrix);
     void addVectori(const std::vector<int>& vector);
 
     void addSkip();
     void addCvMat(const cv::Mat& mat);
     void addPaper(Paper& paper);
+    size_t addScript(Script& script, int id);
     void addVectorCvMat(const std::vector<cv::Mat>& mats);
     void addVectorPapers(std::vector<Paper>& papers);
-
 
   private:
     boost::asio::io_service _ioService;

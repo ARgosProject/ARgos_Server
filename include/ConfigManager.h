@@ -38,7 +38,7 @@ namespace argosServer{
       return extrinsicsParametersFile;
     }
 
-    static const vector<string>& getScriptsList(){
+    static const vector<std::pair<int, string>>& getScriptsList(){
       return scriptsList;
     }
 
@@ -62,7 +62,7 @@ namespace argosServer{
     static string projectorCalibrationFile;
     static string extrinsicsParametersFile;
 
-    static vector<string> scriptsList;
+    static vector<std::pair<int, string>> scriptsList;
     static vector<string> descriptorsList;
     static vector<string> descriptionsList;
 

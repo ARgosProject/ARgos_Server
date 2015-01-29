@@ -24,7 +24,7 @@ namespace argosServer{
   string ConfigManager::projectorCalibrationFile;
   string ConfigManager::extrinsicsParametersFile;
 
-  vector<string> ConfigManager::scriptsList;
+  vector<std::pair<int, string>> ConfigManager::scriptsList;
   vector<string> ConfigManager::descriptorsList;
   vector<string> ConfigManager::descriptionsList;
 
@@ -58,7 +58,9 @@ namespace argosServer{
     argosPaperNode = xml_root->first_node("argos_papers");
     paperNode = argosPaperNode->first_node("paper");
     while(paperNode){
-      // int id = atoi(paperNode->first_attribute("id")->value());
+      int id = atoi(paperNode->first_attribute("id")->value());
+      Log::success("Loaded Id: '" + std::to_string(id) + "'");
+
       string description = paperNode->first_attribute("description")->value();
       if(description.empty()) Log::error("Error on description loading");
       else Log::success("Loaded description: '" + description + "'");
@@ -71,7 +73,7 @@ namespace argosServer{
       if(descriptorFileName.empty()) Log::error("Error on descriptorFileName loading");
       else Log::success("Loaded descriptorFileName: '" + descriptorFileName + "'");
 
-      scriptsList.push_back(scriptFileName);
+      scriptsList.push_back(std::make_pair(id, scriptFileName));
       descriptorsList.push_back(descriptorFileName);
       descriptionsList.push_back(description);
 

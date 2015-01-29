@@ -9,7 +9,7 @@
 namespace argosServer {
 
   ScriptSentence::ScriptSentence(const std::string& scriptSentence)
-    : _command("") {
+    : _sf(NULL), _command("") {
     decouple(scriptSentence);
   }
 
@@ -17,8 +17,9 @@ namespace argosServer {
     _args.clear();
   }
 
-  void ScriptSentence::execute(Script& owner, const ScriptManager& scriptManager) {
-    scriptManager._handlers.at(_command)->execute(owner, _args);
+  void ScriptSentence::execute(Script& owner, const ScriptManager& scriptManager, Communicator& com) {
+    _sf = scriptManager._handlers.at(_command);
+    _sf->execute(owner, _args, com);
   }
 
   size_t ScriptSentence::numArgs() const {
@@ -29,8 +30,16 @@ namespace argosServer {
     return _command;
   }
 
+  const std::string& ScriptSentence::getArg(int index) const {
+    return _args[index];
+  }
+
   const std::vector<std::string>& ScriptSentence::getArgs() const {
     return _args;
+  }
+
+  ScriptFunction* ScriptSentence::getScriptFunction() {
+    return _sf;
   }
 
   void ScriptSentence::decouple(const std::string& scriptSentence) {

@@ -161,14 +161,16 @@ namespace argosServer{
     //Detection of papers in the image passed
     PaperDetector::getInstance().detect(currentFrame, paperList, cameraProjector,
                                         ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay);
-    Log::paper(paperList.back());
+
+    if(!paperList.empty())
+      Log::paper(paperList.back());
 
     //cv::Point fingerPoint;
     //HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
     //if(fingerPoint.x >= 0 && fingerPoint.y >= 0)
     //PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
 
-    ScriptManager::getInstance().update();
+    //ScriptManager::getInstance().update();
 
     numInvoices = paperList.size();
 

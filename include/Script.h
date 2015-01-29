@@ -19,14 +19,17 @@ namespace argosServer {
     const std::string& getProperty(const std::string& key);
     void setProperty(const std::string& key, const std::string& value);
 
+    std::vector<ScriptSentence>& getSentences();
+    int getNumberOfSentences() const;
+
     void setSecondsToWait(float secondsToWait);
 
     int load(const std::string& path);
     void enable(bool enabled);
-    void update();
+    //void update();
 
   private:
-    void runOneSentence();
+    //void runOneSentence();
 
   private:
     ScriptManager& _scriptManager;

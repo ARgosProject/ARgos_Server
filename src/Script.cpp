@@ -23,6 +23,14 @@ namespace argosServer {
     _properties[key] = value;
   }
 
+  std::vector<ScriptSentence>& Script::getSentences() {
+    return _sentences;
+  }
+
+  int Script::getNumberOfSentences() const {
+    return _sentences.size();
+  }
+
   void Script::setSecondsToWait(float secondsToWait) {
     if(secondsToWait != 0.0f)
       _timer.start();
@@ -71,7 +79,7 @@ namespace argosServer {
     _enabled = enabled;
   }
 
-  void Script::update() {
+  /*void Script::update() {
     if(!_enabled)
       return;
 
@@ -84,9 +92,9 @@ namespace argosServer {
     }
 
     runOneSentence();
-  }
+    }*/
 
-  void Script::runOneSentence() {
+  /*void Script::runOneSentence() {
     if(_sentences.empty())
       return;
 
@@ -97,6 +105,6 @@ namespace argosServer {
       if(!_repeat)
         _enabled = false;
     }
-  }
+    }*/
 
 }
