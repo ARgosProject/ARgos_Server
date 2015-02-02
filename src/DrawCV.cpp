@@ -2,17 +2,18 @@
 using namespace cv;
 
 namespace argosServer{
-  /****
-   *
-   *
-   *
-   ****/
-  void DrawCV::draw3dAxis(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
-  
-    CameraModel& camera = cameraProjector.getCamera();
 
+
+  /********************************************************************************************
+   *  SCREEN DISPLAY
+   ********************************************************************************************/
+  
+  void DrawCV::draw3DAxis(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
+    
+    CameraModel& camera = cameraProjector.getCamera();
+    
     float size = paper.getPaperSize().width / 2;
- 
+    
     Mat objectPoints (4,3,CV_32FC1);
     objectPoints.at<float>(0,0) = 0;
     objectPoints.at<float>(0,1) = 0;
@@ -21,7 +22,7 @@ namespace argosServer{
     objectPoints.at<float>(1,0) = size;
     objectPoints.at<float>(1,1) = 0;
     objectPoints.at<float>(1,2) = 0;
-
+    
     objectPoints.at<float>(2,0) = 0;
     objectPoints.at<float>(2,1) = size;
     objectPoints.at<float>(2,2) = 0;
@@ -29,7 +30,7 @@ namespace argosServer{
     objectPoints.at<float>(3,0) = 0;
     objectPoints.at<float>(3,1) = 0;
     objectPoints.at<float>(3,2) = size;
-  
+    
     vector<Point2f> imagePoints;
     cv::projectPoints(objectPoints, paper.getRotVec(), paper.getTransVec(), camera.getDistortedCamMatrix(), camera.getDistCoeffs(), imagePoints);
     //draw lines of different colours
@@ -41,12 +42,8 @@ namespace argosServer{
     putText(image,"z", imagePoints[3],FONT_HERSHEY_SIMPLEX, 0.6, Scalar(255,0,0,255), 2);
   }
 
-  /****
-   *
-   *
-   *
-   ****/
-  void DrawCV::draw3dCube(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
+ 
+  void DrawCV::draw3DCube(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
 
     Mat objectPoints (8,3,CV_32FC1);
   
@@ -88,14 +85,13 @@ namespace argosServer{
 
     for (int i=0;i<4;i++)
       cv::line(image, imagePoints[i+4], imagePoints[4+(i+1)%4], Scalar(0,0,255,255),1,CV_AA);
-
+    
     for (int i=0;i<4;i++)
       cv::line(image, imagePoints[i], imagePoints[i+4], Scalar(0,0,255,255),1,CV_AA);
-
+    
   }
-
-
-  void DrawCV::draw3dPaper(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
+  
+  void DrawCV::draw3DPaper(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
 
     Mat objectPoints (8,3,CV_32FC1);
   
@@ -192,14 +188,15 @@ namespace argosServer{
     putText(image, text, centroid ,FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0,0,255),2);
   
 
-
-
- 
     // for(size_t i = 0; i < imagePoints.size(); i++)
     //	  cv::circle(image, imagePoints[i], 10,  CV_RGB(255,255,255), -1, 8);
   
   }
 
+  /********************************************************************************************
+   * PROJECTOR  DISPLAY
+   ********************************************************************************************/
+  
   void DrawCV::projectPaper(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Mat& video,  cv::Mat& out){
   
     CameraModel& projector = cameraProjector.getProjector();

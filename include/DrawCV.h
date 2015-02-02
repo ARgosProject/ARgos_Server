@@ -7,9 +7,6 @@
 #include "Paper.h"
 #include "CameraProjectorSystem.h"
 
-
-
-
 namespace argosServer{
   
   /** 
@@ -18,18 +15,27 @@ namespace argosServer{
   class DrawCV{
     
   public:
+    /********************************************************************************************
+     *  SCREEN DISPLAY
+     ********************************************************************************************/
+    
     /** 
-     * Draws 3D Axis in center of paper
+     * Draws 3D coordinate axis in center of paper
      */
-    static void draw3dAxis(cv::Mat& image, Paper& p, CameraProjectorSystem& cameraProjector);
+    static void draw3DAxis(cv::Mat& image, Paper& p, CameraProjectorSystem& cameraProjector);
     /** 
      * Draws 3D cube in center of paper
      */
-    static void draw3dCube(cv::Mat& image, Paper& p, CameraProjectorSystem& cameraProjector);
+    static void draw3DCube(cv::Mat& image, Paper& p, CameraProjectorSystem& cameraProjector);
     /** 
      *  Draws 3D cube overlaping the paper
      */
-    static void draw3dPaper(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector);
+    static void draw3DPaper(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector);
+    
+    /********************************************************************************************
+     * PROJECTOR  DISPLAY
+     ********************************************************************************************/
+    
     /** 
      * Draws the invoice projected
      */

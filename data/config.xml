@@ -3,7 +3,7 @@
   
   <paper_size width="21.0" height="29.7" />
   
-  <calibration_files camera="calibrationCamera.xml" projector="calibrationProjector.xml" extrinsics="CameraProjectorExtrinsics.xml" />
+  <calibration_files camera="calibrationCamera.yml" projector="calibrationProjector.yml" extrinsics="CameraProjectorExtrinsics.yml" />
 
   <argos_papers>
     <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ars" descriptorFileName="neobiz-.jpg" />

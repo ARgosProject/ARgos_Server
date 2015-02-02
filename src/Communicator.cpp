@@ -27,9 +27,27 @@ namespace argosServer{
       delete _tcpSocket;
   }
 
+  void Communicator::processCvMat(StreamType& st) {
+    Log::success("New cv::Mat received. Size: " + std::to_string(st.size));
+    
+    //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
+    cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
+    //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
+    //projectorFrame = Core::getInstance().processCvMat(currentFrame);
+    //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
+    //addCvMat(projectorFrame);
+    
+    paperList = Core::getInstance().update(currentFrame, initVideoConference);
+    
+    if(paperList.empty())
+      addSkip();
+    else
+      addPaper(paperList.back());
+  }
+  
   void Communicator::run() {
     tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
-
+    
     while(1) {
       Log::info("Server listening at " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
       a.accept(*_tcpSocket);
@@ -247,23 +265,7 @@ namespace argosServer{
     // Procesar vector (tmp) aquí
   }
 
-  void Communicator::processCvMat(StreamType& st) {
-    Log::success("New cv::Mat received. Size: " + std::to_string(st.size));
-
-    //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
-    cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
-    //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
-    //projectorFrame = Core::getInstance().processCvMat(currentFrame);
-    //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
-    //addCvMat(projectorFrame);
-
-    paperList = Core::getInstance().update(currentFrame, initVideoConference);
-
-    if(paperList.empty())
-      addSkip();
-    else
-      addPaper(paperList.back());
-  }
+ 
 
   int Communicator::send() const {
     int buff_size = _buff.size();
