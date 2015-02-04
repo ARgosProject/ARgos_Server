@@ -355,17 +355,22 @@ namespace argosServer{
     unsigned char sMatrix[size];
     memcpy(sMatrix, modelview_matrix, size);
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
-
-    // Script
-    Script& script = ScriptManager::getInstance().getScript(id);
-
+    
     size = 0;
     addInt(type);                            // Type
     addInt(-1);                              // Size placeholder
     size += addInt(id);                      // Paper Id
     size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
-    size += addScript(script, id);           // Paper script
 
+    // Script
+    if((id >= 0) && (id <= 2)) {
+      Script& script = ScriptManager::getInstance().getScript(id);
+      size += addScript(script, id);           // Paper script
+    }
+    else {
+      size += addInt(0);
+    }
+    
     // Real size
     unsigned char val_chars[sizeof(int)];
     memcpy(val_chars, &size, sizeof(int));

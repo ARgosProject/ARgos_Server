@@ -190,7 +190,7 @@ namespace argosServer{
 	numFrames = 0;
       }
       else{
-	if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
+	if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || (numFrames > 30)){
 	  isPreviousPaperDetected = true;
 	  numFrames = 0;
 	  previousNumInvoices = numInvoices;

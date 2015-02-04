@@ -232,7 +232,7 @@ namespace argosServer{
     if (setYPerperdicular)
       rotateXAxis(rotVec);
 
-    cout<<(*this)<<endl;
+    //cout<<(*this)<<endl;
   }
 
 
