@@ -160,8 +160,7 @@ namespace argosServer{
 
     //Detection of papers in the image passed
     PaperDetector::getInstance().detect(currentFrame, paperList, cameraProjector,
-                                        ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay);
-
+                                        ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay());
     if(!paperList.empty())
       Log::paper(paperList.back());
 
@@ -177,44 +176,44 @@ namespace argosServer{
     //checkRegion(currentFrame,paperList);
 
 
-    /* Funcionalidad Anterior
-       if (initVideoConference){
-       if ( paperList.size() == 0)
-       initVideoConference = false;
-       }
-
-       else{
-       if (paperList.size() == 0 ){
-       //cout << "Detecting NONE" << endl;
-       isPreviousPaperDetected = false;
-       previousNumInvoices = 0;
-       numFrames = 0;
-       }
-       else{
-       if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
-       isPreviousPaperDetected = true;
-       numFrames = 0;
-       previousNumInvoices = numInvoices;
-
-       DocumentDetector::getInstance().detect(currentFrame,paperList);
-
-       invoicesIndex.clear();
-       //cout <<  "invoicesIndex clear "<< endl;
-       for (unsigned int i=0; i<paperList.size(); i++){
-       initVideoConference = (paperList[i].getId() == 999);
-       invoicesIndex.push_back(paperList[i].getId());
-       //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
-       }
-       }
-       }
-       }
-
-       for (unsigned int i=0; i<paperList.size(); i++){
-       Log::info(std::to_string(invoicesIndex[i]));
-       paperList[i].setId(invoicesIndex[i]);
-       }
-    */
-
+    //Funcionalidad Anterior
+    if (initVideoConference){
+      if ( paperList.size() == 0)
+	initVideoConference = false;
+    }
+    
+    else{
+      if (paperList.size() == 0 ){
+	//cout << "Detecting NONE" << endl;
+	isPreviousPaperDetected = false;
+	previousNumInvoices = 0;
+	numFrames = 0;
+      }
+      else{
+	if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || numFrames > 30){
+	  isPreviousPaperDetected = true;
+	  numFrames = 0;
+	  previousNumInvoices = numInvoices;
+	  
+	  DocumentDetector::getInstance().detect(currentFrame,paperList);
+	  
+	  invoicesIndex.clear();
+	  //cout <<  "invoicesIndex clear "<< endl;
+	  for (unsigned int i=0; i<paperList.size(); i++){
+	    initVideoConference = (paperList[i].getId() == 999);
+	    invoicesIndex.push_back(paperList[i].getId());
+	    //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+	  }
+	}
+      }
+    }
+    
+    for (unsigned int i=0; i<paperList.size(); i++){
+      Log::info(std::to_string(invoicesIndex[i]));
+      paperList[i].setId(invoicesIndex[i]);
+    }
+    
+    
     /*
       if (paperList.size() == 0 ){
       //cout << "Detecting NONE" << endl;
