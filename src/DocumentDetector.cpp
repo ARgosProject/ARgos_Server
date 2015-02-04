@@ -61,8 +61,8 @@ namespace argosServer{
       warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
       //else
       //warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      //imshow("trainFrame",paperContent);
-      //waitKey(1);
+      imshow("trainFrame",paperContent);
+      waitKey(1);
       // extract feautures and compute descriptors of current frame
       featureDetector->detect(paperContent, trainKeypoints );
       descriptorExtractor->compute(paperContent, trainKeypoints, trainDescriptors);

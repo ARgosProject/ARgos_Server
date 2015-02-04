@@ -355,7 +355,7 @@ namespace argosServer{
     unsigned char sMatrix[size];
     memcpy(sMatrix, modelview_matrix, size);
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
-
+    
     size = 0;
     addInt(type);                            // Type
     addInt(-1);                              // Size placeholder
@@ -370,7 +370,7 @@ namespace argosServer{
     else {
       size += addInt(0);
     }
-
+    
     // Real size
     unsigned char val_chars[sizeof(int)];
     memcpy(val_chars, &size, sizeof(int));
