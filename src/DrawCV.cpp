@@ -243,15 +243,15 @@ namespace argosServer{
       //cout << "pointsRes: " << pointsRes[i] <<endl;
     }
     Mat M=getPerspectiveTransform ( pointsIn,pointsRes );
-    ///cout << "M: " << M << endl;
-    cv::Mat out1(480, 640,CV_8UC3);
-    cv::warpPerspective ( video, out1,  M, Size(640,480),cv::INTER_NEAREST );
+    cout << "M: " << M << endl;
+    cv::Mat out1(600,800,CV_8UC3);
+    cv::warpPerspective ( video, out,  M, Size(800,600),cv::INTER_NEAREST );
 
     double alpha = 1;
     double beta = 1;
     double gamma = 0.0; //offset 
   
-    addWeighted(image,alpha,out1,beta,gamma,image);
+    //addWeighted(image,alpha,out1,beta,gamma,image);
  
   }
 
