@@ -75,13 +75,17 @@ namespace argosServer{
     // Convex Hull contours------------------------------------------------
     convexHullContours(contours, PaperCandidates);
     //for (size_t i = 0; i < contours.size(); i++)
-    //drawContour(debug,contours[i],Scalar(255,0,225));
-
+    //  drawContour(debug,contours[i], CV_RGB(255,0,255));
+    //imshow("debug", debug);
+    
     if (PaperCandidates.size() == 0){
       Log::info("HoughSpace");
       // Hough Line Transform
       houghLineTransform(thres0, PaperCandidates);
     }
+
+    //cv::waitKey(1);
+
 
     // Sort the points in anti-clockwise order
     valarray<bool> swapped(false,PaperCandidates.size());  //used later
@@ -122,9 +126,8 @@ namespace argosServer{
         PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
     }
 
-    // Return vector
+    // Perception Historic
     for (unsigned int i=0;i<PaperCandidates.size();i++ ){
-
       if (PaperCandidates.size() == 1){
         if (historicRot.size() == 0 && historicTrans.size() == 0){
           historicRot.clear();
@@ -175,10 +178,11 @@ namespace argosServer{
       }
       //cout << "PaperCandidates " << PaperCandidates[i] << endl;
 
+      // Return vector
       detectedPapers.push_back(PaperCandidates[i]);
     }
   }
-
+  
   cv::Mat PaperDetector::calculateAverage(std::deque<cv::Mat> &matrix){
     cv::Mat avg(1,3,CV_32FC1,Scalar::all(0.0));
     for(unsigned int i=0; i<matrix.size(); i++){
@@ -461,17 +465,19 @@ namespace argosServer{
 
   void PaperDetector::houghLineTransform(cv::Mat& image, vector<PaperCandidate> &PaperCandidates){
     cv::Mat  image_c;
-    //cv::Mat dst = image.clone();
-    //cvtColor(dst, dst, CV_GRAY2BGR );
-    //cv::Mat dst2;
-    //dst.copyTo(dst2);
-    //dst2 = Scalar::all(0);
+    
+    cv::Mat dst = image.clone();
+    
+    cvtColor(dst, dst, CV_GRAY2BGR );
+    cv::Mat dst2;
+    dst.copyTo(dst2);
+    dst2 = Scalar::all(0);
 
     vector<cv::Point> projectionLimits;
-    projectionLimits.push_back(cv::Point(250,184));
-    projectionLimits.push_back(cv::Point(539,193));
-    projectionLimits.push_back(cv::Point(548,439));
-    projectionLimits.push_back(cv::Point(214,427));
+    projectionLimits.push_back(cv::Point(262,172));
+    projectionLimits.push_back(cv::Point(579,200));
+    projectionLimits.push_back(cv::Point(559,446));
+    projectionLimits.push_back(cv::Point(228,412));
 
     //drawApproxCurve (dst ,projectionLimits, CV_RGB(0,0,255));
     //drawApproxCurve (dst2 ,projectionLimits, CV_RGB(0,0,255));
@@ -570,7 +576,7 @@ namespace argosServer{
     //cv::imshow("image", dst);
     //cv::imshow("image2", dst2);
     //cv::imshow("quadrilateral", quad);
-    //cv::waitKey(1);
+    
   }
 
   bool PaperDetector::isInto ( Mat &contour,vector<Point2f> &b ){
