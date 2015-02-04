@@ -100,11 +100,11 @@ namespace argosServer{
 
         if(max_index == -1){
           //cout << "error index -1" << endl;
-          detectedPapers[i].setId(0);
+          detectedPapers[i].setId(-1);
         }
         else{
           //cout <<  "Detecting: " << queryImagesNames.at(max_index) << endl;
-          detectedPapers[i].setId(max_index+1);
+          detectedPapers[i].setId(max_index);
         }
       }
     }
