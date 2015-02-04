@@ -1,16 +1,16 @@
-
 <config>
-  
+
   <paper_size width="21.0" height="29.7" />
-  
+
   <calibration_files camera="calibrationCamera.yml" projector="calibrationProjector.yml" extrinsics="CameraProjectorExtrinsics.yml" />
 
   <argos_papers>
     <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ars" descriptorFileName="neobiz-.jpg" />
     <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ars" descriptorFileName="sinovo-.jpg" />
     <paper id="2" description="Active" scriptFileName="ActiveScript.ars" descriptorFileName="active-.jpg" />
+    <paper id="999" description="Blank" scriptFileName="BlankScript.ars" descriptorFileName="blank-.jpg" />
   </argos_papers>
-  
+
   <output_display type="projector" />
 
 </config>

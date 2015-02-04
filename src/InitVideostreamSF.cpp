@@ -20,6 +20,9 @@ namespace argosServer {
     // Port
     size += com.addInt(getArgAsInt(args[3]));
 
+    // Init video conference server
+    com.initVideoConference(args[3]);
+
     _properties["bytes"] = std::to_string(size);
   }
 

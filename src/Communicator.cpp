@@ -18,7 +18,7 @@ namespace argosServer{
     _tcpSocket = new tcp::socket(_ioService);
 
     Core::getInstance();
-    initVideoConference = false;
+    _initVideoConference = false;
 
   }
 
@@ -37,7 +37,7 @@ namespace argosServer{
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
     //addCvMat(projectorFrame);
 
-    paperList = Core::getInstance().update(currentFrame, initVideoConference);
+    paperList = Core::getInstance().update(currentFrame, _initVideoConference);
 
     if(paperList.empty())
       addSkip();
@@ -130,15 +130,17 @@ namespace argosServer{
           break;
         }
 
-        if(initVideoConference) {
+        /*
+        if(_initVideoConference) {
           if(_threadDone) {
             Log::video("New videostream started.");
             _threadDone = false;
             _videoThread.reset();
-            _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this, st);
+            _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this);
             _videoThread->detach();
           }
         }
+        */
 
         if(!_buff.empty()) {
           send();
@@ -153,9 +155,20 @@ namespace argosServer{
     }
   }
 
-  void Communicator::startVideoStream(StreamType st) {
+  void Communicator::initVideoConference(const std::string& port) {
+    _initVideoConference = true;
+
+    if(_threadDone) {
+      Log::video("New videostream started.");
+      _threadDone = false;
+      _videoThread.reset();
+      _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this, port);
+      _videoThread->detach();
+    }
+  }
+
+  void Communicator::startVideoStream(const std::string& port) {
     const std::string ip = _tcpSocket->remote_endpoint().address().to_string();
-    const std::string port("9999");
     Log::video("Sending video to " + ip + ":" + port);
 
     const string videoStream = "Video Stream";
@@ -181,7 +194,7 @@ namespace argosServer{
 
     cv::Mat frame;
 
-    while(initVideoConference) {
+    while(_initVideoConference) {
       // Frame receive
       _receive = false;
 
@@ -355,7 +368,7 @@ namespace argosServer{
     unsigned char sMatrix[size];
     memcpy(sMatrix, modelview_matrix, size);
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
-    
+
     size = 0;
     addInt(type);                            // Type
     addInt(-1);                              // Size placeholder
@@ -363,14 +376,14 @@ namespace argosServer{
     size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
 
     // Script
-    if((id >= 0) && (id <= 2)) {
+    if(((id >= 0) && (id <= 2)) || (id == 999)) {
       Script& script = ScriptManager::getInstance().getScript(id);
-      size += addScript(script, id);           // Paper script
+      size += addScript(script, id);         // Paper script
     }
     else {
       size += addInt(0);
     }
-    
+
     // Real size
     unsigned char val_chars[sizeof(int)];
     memcpy(val_chars, &size, sizeof(int));

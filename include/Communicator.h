@@ -84,7 +84,8 @@ namespace argosServer{
     void processVectori(StreamType& st);
     void processCvMat(StreamType& st);
 
-    void startVideoStream(StreamType st);
+    void initVideoConference(const std::string& port);
+    void startVideoStream(const std::string& port);
     size_t sendCvMatVideoStream(const cv::Mat& mat, udp::socket& udpSocket, const udp::endpoint& udpEndpoint);
 
     int send() const;
@@ -119,7 +120,7 @@ namespace argosServer{
     cv::Mat currentFrame;		// current frame
     //cv::Mat projectorFrame;	// projector openCV frame
     vector<Paper> paperList;
-    bool initVideoConference;
+    bool _initVideoConference;
     //vector<int> invoicesIndex;
   };
 }
