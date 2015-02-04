@@ -1,4 +1,4 @@
-# Script para Neobiz
+# Script para Active
 > DrawCorners 3.0 3.0 0.0 0.0 1.0 21.0 29.7
-> DrawImage active.jpg 5.64 -8.67 0.0 -1.0 1.0
+> DrawImage active.wav 5.64 -8.67 0.0 -4.042 4.56
 > PlaySound active.wav 0

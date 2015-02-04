@@ -29,25 +29,25 @@ namespace argosServer{
 
   void Communicator::processCvMat(StreamType& st) {
     Log::success("New cv::Mat received. Size: " + std::to_string(st.size));
-    
+
     //cv::imdecode(st.data, cv::IMREAD_GRAYSCALE, &currentFrame);             // Decode cv::Mat
     cv::imdecode(st.data, CV_LOAD_IMAGE_COLOR, &currentFrame);             // Decode cv::Mat
     //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
     //projectorFrame = Core::getInstance().processCvMat(currentFrame);
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
     //addCvMat(projectorFrame);
-    
+
     paperList = Core::getInstance().update(currentFrame, initVideoConference);
-    
+
     if(paperList.empty())
       addSkip();
     else
       addPaper(paperList.back());
   }
-  
+
   void Communicator::run() {
     tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
-    
+
     while(1) {
       Log::info("Server listening at " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
       a.accept(*_tcpSocket);
@@ -265,7 +265,7 @@ namespace argosServer{
     // Procesar vector (tmp) aquí
   }
 
- 
+
 
   int Communicator::send() const {
     int buff_size = _buff.size();
@@ -356,15 +356,20 @@ namespace argosServer{
     memcpy(sMatrix, modelview_matrix, size);
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
 
-    // Script
-    Script& script = ScriptManager::getInstance().getScript(id);
-
     size = 0;
     addInt(type);                            // Type
     addInt(-1);                              // Size placeholder
     size += addInt(id);                      // Paper Id
     size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
-    size += addScript(script, id);           // Paper script
+
+    // Script
+    if((id >= 0) && (id <= 2)) {
+      Script& script = ScriptManager::getInstance().getScript(id);
+      size += addScript(script, id);           // Paper script
+    }
+    else {
+      size += addInt(0);
+    }
 
     // Real size
     unsigned char val_chars[sizeof(int)];
