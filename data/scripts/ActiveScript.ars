@@ -1,4 +1,7 @@
 # Script para Active
 > DrawCorners 3.0 3.0 0.0 0.0 1.0 21.0 29.7
 > DrawImage active.jpg 5.64 -8.67 0.0 -4.042 4.56
+
+#                 R   G   B   X   Y   Z   W   H
+> DrawHighlight 0.0 1.0 0.0 -5.25 -2.8 0.0 4.5 1.5
 > PlaySound active.wav 0
