@@ -55,14 +55,40 @@ namespace argosServer{
    * Main detection function. Performs all steps
    */
   void DocumentDetector::detect(const cv::Mat& trainFrame, vector<Paper>& detectedPapers){
-
+    
+    double  distance_0_1;
+    double  distance_1_2;
+    double  distance_2_3;
+    double  distance_3_0;
+    
     for (unsigned int i=0; i<detectedPapers.size(); i++){
+      distance_0_1 = cv::norm( (detectedPapers[i])[0] - (detectedPapers[i])[1] );
+      distance_1_2 = cv::norm( (detectedPapers[i])[1] - (detectedPapers[i])[2] );
+      distance_2_3 = cv::norm( (detectedPapers[i])[2] - (detectedPapers[i])[3] );
+      distance_3_0 = cv::norm( (detectedPapers[i])[3] - (detectedPapers[i])[0] );
+      
+      cout << "distance_0_1: "<<  distance_0_1 << endl;
+      cout << "distance_1_2: "<<  distance_1_2 << endl;
+      cout << "distance_2_3: "<<  distance_2_3 << endl;
+      cout << "distance_3_0: "<<  distance_3_0 << endl;
+      
+      cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
+      cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
+
+
+      if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0) )
+	warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+      else
+	warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
+      
       //if (detectedPapers[i].getTransVec().at<float>(0) > 0)
-      warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+      //warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
       //else
       //warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      //imshow("trainFrame",paperContent);
-      //waitKey(1);
+      imshow("trainFrame",paperContent);
+      waitKey(1);
+      
+
       // extract feautures and compute descriptors of current frame
       featureDetector->detect(paperContent, trainKeypoints );
       descriptorExtractor->compute(paperContent, trainKeypoints, trainDescriptors);
