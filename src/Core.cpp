@@ -89,23 +89,23 @@ namespace argosServer{
       }
       else{
         if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)){// || (numFrames > 30)){
-          isPreviousPaperDetected = true;
-          numFrames = 0;
-          previousNumInvoices = numInvoices;
-
-          DocumentDetector::getInstance().detect(currentFrame,paperList);
-
-          invoicesIndex.clear();
-          //cout <<  "invoicesIndex clear "<< endl;
-          for (unsigned int i=0; i<paperList.size(); i++){
-            initVideoConference = (paperList[i].getId() == 999);
-            invoicesIndex.push_back(paperList[i].getId());
-            //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
-          }
-        }
+	  isPreviousPaperDetected = true;
+	  numFrames = 0;
+	  previousNumInvoices = numInvoices;
+	  
+	  DocumentDetector::getInstance().detect(currentFrame,paperList);
+	  
+	  invoicesIndex.clear();
+	  //cout <<  "invoicesIndex clear "<< endl;
+	  for (unsigned int i=0; i<paperList.size(); i++){
+	  initVideoConference = (paperList[i].getId() == 999);
+	  invoicesIndex.push_back(paperList[i].getId());
+	  //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
+	  }
+	}
       }
     }
-
+    
     for (unsigned int i=0; i<paperList.size(); i++){
       Log::info(std::to_string(invoicesIndex[i]));
       paperList[i].setId(invoicesIndex[i]);

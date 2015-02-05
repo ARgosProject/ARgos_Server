@@ -67,13 +67,13 @@ namespace argosServer{
       distance_2_3 = cv::norm( (detectedPapers[i])[2] - (detectedPapers[i])[3] );
       distance_3_0 = cv::norm( (detectedPapers[i])[3] - (detectedPapers[i])[0] );
       
-      cout << "distance_0_1: "<<  distance_0_1 << endl;
-      cout << "distance_1_2: "<<  distance_1_2 << endl;
-      cout << "distance_2_3: "<<  distance_2_3 << endl;
-      cout << "distance_3_0: "<<  distance_3_0 << endl;
+      //cout << "distance_0_1: "<<  distance_0_1 << endl;
+      //cout << "distance_1_2: "<<  distance_1_2 << endl;
+      //cout << "distance_2_3: "<<  distance_2_3 << endl;
+      //cout << "distance_3_0: "<<  distance_3_0 << endl;
       
-      cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
-      cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
+      //cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
+      //cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
 
 
       if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0) )
@@ -85,8 +85,8 @@ namespace argosServer{
       //warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
       //else
       //warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      imshow("trainFrame",paperContent);
-      waitKey(1);
+      //imshow("trainFrame",paperContent);
+      //waitKey(1);
       
 
       // extract feautures and compute descriptors of current frame
