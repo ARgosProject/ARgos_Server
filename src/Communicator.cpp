@@ -6,6 +6,8 @@
 #include "Script.h"
 #include "ScriptSentence.h"
 #include "ScriptFunction.h"
+#include "ConfigManager.h"
+
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <ifaddrs.h>
@@ -14,12 +16,10 @@
 namespace argosServer{
 
   Communicator::Communicator(unsigned short port, const char* iface)
-    : _port(port), _iface(iface), _threadDone(true), _receive(false) {
+    : _port(port), _iface(iface), _threadDone(true), _receive(false), _initVideoConference(false) {
     _tcpSocket = new tcp::socket(_ioService);
 
     Core::getInstance();
-    _initVideoConference = false;
-
   }
 
   Communicator::~Communicator() {
@@ -129,18 +129,6 @@ namespace argosServer{
         default:
           break;
         }
-
-        /*
-        if(_initVideoConference) {
-          if(_threadDone) {
-            Log::video("New videostream started.");
-            _threadDone = false;
-            _videoThread.reset();
-            _videoThread = std::make_shared<std::thread>(&Communicator::startVideoStream, this);
-            _videoThread->detach();
-          }
-        }
-        */
 
         if(!_buff.empty()) {
           send();
@@ -278,8 +266,6 @@ namespace argosServer{
     // Procesar vector (tmp) aquí
   }
 
-
-
   int Communicator::send() const {
     int buff_size = _buff.size();
     Log::info("Sending " + std::to_string(buff_size) + " bytes...");
@@ -336,7 +322,7 @@ namespace argosServer{
   }
 
   void Communicator::addSkip() {
-    addInt((int)Type::SKIP);
+    addInt(static_cast<int>(Type::SKIP));
   }
 
   void Communicator::addCvMat(const cv::Mat& mat) {
@@ -376,7 +362,17 @@ namespace argosServer{
     size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
 
     // Script
-    if(((id >= 0) && (id <= 2)) || (id == 999)) {
+    // Check whether there is a script associated
+    bool found = false;
+    auto& scripts = ConfigManager::getScriptsList();
+    for(auto& script_pair : scripts) {
+      if(script_pair.first == id) {
+        found = true;
+        break;
+      }
+    }
+
+    if(found) {
       Script& script = ScriptManager::getInstance().getScript(id);
       size += addScript(script, id);         // Paper script
     }
