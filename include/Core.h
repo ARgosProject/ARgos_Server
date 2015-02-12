@@ -51,6 +51,12 @@ namespace argosServer {
 
     void checkRegion(cv::Mat& currentFrame,vector<Paper>& detectedPapers);
     bool warp (const cv::Mat& in, cv::Mat& out, Size size, vector<Point2f> points ) throw ( cv::Exception );
+    //cv::Point3f triangulatePoint(const vector<cv::Point2f>& ps, const vector<cv::Mat>& Rs, 
+    //				 const vector<cv::Mat>& ts, const cv::Mat& cameraMatrix);
+    
+    //cv::Point3f findRayIntersection(cv::Point3f k1, cv::Point3f b1, cv::Point3f k2, cv::Point3f b2);    
+
+    void calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& cameraMatrix);
 
   private:
     cv::Mat currentFrame;                 ///<  Current frame

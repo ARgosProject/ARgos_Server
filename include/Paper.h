@@ -74,6 +74,14 @@ namespace argosServer{
       id = number;
     }
 
+    cv::Point&  getFingerPoint(){
+      return fingerPoint;
+    }
+    
+    void setFingerPoint(cv::Point pt){
+      fingerPoint = pt;
+    }
+
     /**
      * Indicates if this object is valid
      */
@@ -135,6 +143,7 @@ namespace argosServer{
     cv::Size paperSize;                     // size of the paper sides in meters
     cv::Mat rotVec;                         // rotation matrix (Object->Projector)
     cv::Mat transVec;                       // translation matrix (Object->Projector)
+    cv::Point fingerPoint;
   };
 }
 #endif

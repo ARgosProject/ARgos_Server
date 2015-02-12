@@ -355,11 +355,15 @@ namespace argosServer{
     memcpy(sMatrix, modelview_matrix, size);
     Log::matrix(modelview_matrix, Log::Colour::FG_DARK_GRAY);
 
+    cv::Point& point = paper.getFingerPoint();
+
     size = 0;
     addInt(type);                            // Type
     addInt(-1);                              // Size placeholder
     size += addInt(id);                      // Paper Id
     size += addMatrix16f(modelview_matrix);  // Paper Model-View matrix
+    size += addInt(point.x);
+    size += addInt(point.y);
 
     // Script
     // Check whether there is a script associated

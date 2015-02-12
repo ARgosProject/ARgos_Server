@@ -42,6 +42,59 @@ namespace argosServer{
     putText(image,"z", imagePoints[3],FONT_HERSHEY_SIMPLEX, 0.6, Scalar(255,0,0,255), 2);
   }
 
+  
+  void DrawCV::draw3DAxisInPoint(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Point& finger){
+    
+    CameraModel& camera = cameraProjector.getCamera();
+    
+    float size = paper.getPaperSize().width / 2;
+    
+    Mat objectPoints (4,3,CV_32FC1);
+    objectPoints.at<float>(0,0) = finger.x;
+    objectPoints.at<float>(0,1) = finger.y;
+    objectPoints.at<float>(0,2) = 0;
+
+    objectPoints.at<float>(1,0) = finger.x + size;
+    objectPoints.at<float>(1,1) = finger.y;
+    objectPoints.at<float>(1,2) = 0;
+    
+    objectPoints.at<float>(2,0) = finger.x;
+    objectPoints.at<float>(2,1) = finger.y + size;
+    objectPoints.at<float>(2,2) = 0;
+
+    objectPoints.at<float>(3,0) = finger.x;
+    objectPoints.at<float>(3,1) = finger.y;
+    objectPoints.at<float>(3,2) = size;
+    
+    /*
+    Mat objectPoints (4,3,CV_32FC1);
+    objectPoints.at<float>(0,0) = 0;
+    objectPoints.at<float>(0,1) = 0;
+    objectPoints.at<float>(0,2) = 0;
+
+    objectPoints.at<float>(1,0) = size;
+    objectPoints.at<float>(1,1) = 0;
+    objectPoints.at<float>(1,2) = 0;
+    
+    objectPoints.at<float>(2,0) = 0;
+    objectPoints.at<float>(2,1) = size;
+    objectPoints.at<float>(2,2) = 0;
+
+    objectPoints.at<float>(3,0) = 0;
+    objectPoints.at<float>(3,1) = 0;
+    objectPoints.at<float>(3,2) = size;
+    */
+
+    vector<Point2f> imagePoints;
+    cv::projectPoints(objectPoints, paper.getRotVec(), paper.getTransVec(), camera.getDistortedCamMatrix(), camera.getDistCoeffs(), imagePoints);
+    //draw lines of different colours
+    cv::line(image, imagePoints[0], imagePoints[1], Scalar(0,0,255,255), 1, CV_AA);
+    cv::line(image, imagePoints[0], imagePoints[2], Scalar(0,255,0,255), 1, CV_AA);
+    cv::line(image, imagePoints[0], imagePoints[3], Scalar(255,0,0,255), 1, CV_AA);
+    putText(image,"x", imagePoints[1],FONT_HERSHEY_SIMPLEX, 0.6, Scalar(0,0,255,255), 2);
+    putText(image,"y", imagePoints[2],FONT_HERSHEY_SIMPLEX, 0.6, Scalar(0,255,0,255), 2);
+    putText(image,"z", imagePoints[3],FONT_HERSHEY_SIMPLEX, 0.6, Scalar(255,0,0,255), 2);
+  }
  
   void DrawCV::draw3DCube(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector){
 

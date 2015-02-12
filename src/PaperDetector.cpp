@@ -12,8 +12,10 @@ namespace argosServer{
 
   PaperDetector::PaperDetector(){
     thresMethod = CANNY;
+    //thresParam1 = 100;
     thresParam1 = 150;
     thresParam2 = 255;
+    //thresParam2 = 60;
     minContourValue = 0.1;
     maxContourValue = 0.8;
     contourAreaValue = 5000;
@@ -37,7 +39,7 @@ namespace argosServer{
     currentFrame.copyTo(debug);
     //cv::cvtColor(debug, debug, CV_GRAY2BGR);
 
-    //-Convert to greyScale (it must be a 3 channel image) -------------------------------
+    //- Convert to greyScale  -------------------------------
     if (currentFrame.type() == CV_8UC3)
       cv::cvtColor(currentFrame, greyFrame, CV_BGR2GRAY);
     else
@@ -45,7 +47,7 @@ namespace argosServer{
 
     cv::Mat thres0;
     greyFrame.copyTo(thres0);
-    //-Thresholding image ----------------------------------------------------------------
+    //- Thresholding image ----------------------------------------------------------------
     //cv::threshold(greyFrame, outThres, 127, 255, 0);
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     //cv::threshold (greyFrame, outThres, 165, 255, CV_THRESH_BINARY);
@@ -69,10 +71,11 @@ namespace argosServer{
     cv::findContours(thres2, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_NONE);
     //cv::findContours(thres2, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_SIMPLE);
     //cv::findContours(thres2, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_TC89_L1);
+    
     // Find Rectangles ----------------------------------------------------
     //findRectangles(contours, PaperCandidates);
 
-    // Convex Hull contours------------------------------------------------
+    // Find Rectangles - Convex Hull contours ------------------------------------------------
     convexHullContours(contours, PaperCandidates);
     //for (size_t i = 0; i < contours.size(); i++)
     //  drawContour(debug,contours[i], CV_RGB(255,0,255));
@@ -120,7 +123,7 @@ namespace argosServer{
     removeElements ( PaperCandidates, toRemove );
 
     // Calculate Extrinsics------------------------------------------------
-    ///detect the position of detected markers if desired
+    ///detect the position of detected papers
     if (cameraProjector.isValid()  && (paperSizeMeters.width > 0 && paperSizeMeters.height > 0)) {
       for(unsigned int i=0; i < PaperCandidates.size(); i++)
         PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
@@ -300,7 +303,7 @@ namespace argosServer{
     case FIXED_THRES:
       cv::threshold (grey, out, param1, 255, CV_THRESH_BINARY_INV);
       break;
-    case ADPT_THRES://currently, this is the best method
+    case ADPT_THRES:
       //ensure that _thresParam1%2==1
       if (param1 < 3) param1 = 3;
       else if (((int) param1) %2 != 1) param1 = (int)(param1 + 1);
