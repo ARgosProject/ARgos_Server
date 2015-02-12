@@ -66,20 +66,26 @@ namespace argosServer{
     
     
     //Finger Detection ---------
-    cv::Point fingerPoint;
-    HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
+    cv::Point fingerPoint(291,365);
+    //HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
     
     cout << "fingerPoint:" << fingerPoint << endl;
     
-    
-
-    
-    //CameraModel& camera = cameraProjector.getCamera();
+      
+    CameraModel& camera = cameraProjector.getCamera();
     //CameraModel& projector  = cameraProjector.getProjector();
     
-    //triangulate(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(), 
-    //		camera.getDistortedIntrinsics().getCameraMatrix());
+    cv::Point2f fingerPoint3D(-3.5954266,-16.227814);
+
+    calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(), 
+			   camera.getDistortedIntrinsics().getCameraMatrix());
+    
+    
+    //DrawCV::draw3DAxisInPoint(currentFrame, paperDetected, cameraProjector,fingerPoint3D);
+    //cv::imshow("Test", currentFrame);
+    //cv::waitKey(1);
       
+
     //vector<cv::Point2f> out;
     
     //cv::projectPoints(cv::Mat(ObjPoints),
@@ -208,82 +214,26 @@ namespace argosServer{
     return true;
   }
   
-  /*
-  cv::Point3f triangulatePoint(const vector<cv::Point2f>& ps, const vector<cv::Mat>& Rs, 
-			       const vector<cv::Mat>& ts, const cv::Mat& cameraMatrix){
-    Mat_<double> K(cameraMatrix);
+ 
+  void Core::calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& camMatrix){
     
-    if( ps.size() > 2 ){
-      Mat_<double> L(ps.size()*3, 4), U, evalues;
-      Mat_<double> P(3,4), Rt(3,4), Rt_part1=Rt.colRange(0,3), Rt_part2=Rt.colRange(3,4);
-      
-      for( size_t i = 0; i < ps.size(); i++ ){
-	double x = ps[i].x, y = ps[i].y;
-	Rs[i].convertTo(Rt_part1, Rt_part1.type());
-	ts[i].convertTo(Rt_part2, Rt_part2.type());
-	P = K*Rt;
-      
-	for( int k = 0; k < 4; k++ ){
-	  L(i*3, k) = x*P(2,k) - P(0,k);
-	  L(i*3+1, k) = y*P(2,k) - P(1,k);
-	  L(i*3+2, k) = x*P(1,k) - y*P(0,k);
-	}
-      }
-      
-      cv::eigen(L.t()*L, evalues, U);
-      CV_Assert(evalues(0,0) >= evalues(3,0));
-      
-      double W = fabs(U(3,3)) > FLT_EPSILON ? 1./U(3,3) : 0;
-      return cv::Point3f((float)(U(3,0)*W), (float)(U(3,1)*W), (float)(U(3,2)*W));
-    }
+    Mat_<float> cameraMatrix(camMatrix);
+    cv::Mat rotationMatrix(3,3,cv::DataType<float>::type);
+    cv::Rodrigues(Rs,rotationMatrix);
     
-    else{
-      cv::Mat_<float> iK = K.inv();
-      cv::Mat_<float> R1t = cv::Mat_<float>(Rs[0]).t();
-      cv::Mat_<float> R2t = cv::Mat_<float>(Rs[1]).t();
-      cv::Mat_<float> m1 = (cv::Mat_<float>(3,1) << ps[0].x, ps[0].y, 1);
-      cv::Mat_<float> m2 = (cv::Mat_<float>(3,1) << ps[1].x, ps[1].y, 1);
-      cv::Mat_<float> K1 = R1t*(iK*m1), K2 = R2t*(iK*m2);
-      cv::Mat_<float> B1 = -R1t*cv::Mat_<float>(ts[0]);
-      cv::Mat_<float> B2 = -R2t*cv::Mat_<float>(ts[1]);
-      
-      return findRayIntersection(*K1.ptr<cv::Point3f>(), *B1.ptr<cv::Point3f>(),
-				 *K2.ptr<cv::Point3f>(), *B2.ptr<cv::Point3f>());
-    }
-  }
-  
-  
-  cv::Point3f findRayIntersection(cv::Point3f k1, cv::Point3f b1, cv::Point3f k2, cv::Point3f b2){    
-    float a[4], b[2], x[2];
-    a[0] = k1.dot(k1);
-    a[1] = a[2] = -k1.dot(k2);
-    a[3] = k2.dot(k2);
-    b[0] = k1.dot(b2 - b1);
-    b[1] = k2.dot(b1 - b2);
-    cv::Mat_<float> A(2, 2, a), B(2, 1, b), X(2, 1, x);
-    cv::solve(A, B, X);
-  
-    float s1 = X.at<float>(0, 0);
-    float s2 = X.at<float>(1, 0);
-    return (k1*s1 + b1 + k2*s2 + b2)*0.5f;
-  }
-  */
-
-  void Core::calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& cameraMatrix){
-      
-    cv::Mat uvPoint = cv::Mat::ones(3,1,cv::DataType<double>::type); //u,v,1
-    uvPoint.at<double>(0,0) = ps.x; //got this point using mouse callback
-    uvPoint.at<double>(1,0) = ps.y;
+    cv::Mat uvPoint = cv::Mat::ones(3,1,cv::DataType<float>::type); //u,v,1
+    uvPoint.at<float>(0,0) = ps.x; 
+    uvPoint.at<float>(1,0) = ps.y;
+   
     cv::Mat tempMat, tempMat2;
-    double s;
-    tempMat = Rs.inv() * cameraMatrix.inv() * uvPoint;
-    tempMat2 = Rs.inv() * ts;
+    float s;
+    tempMat = rotationMatrix.inv() * cameraMatrix.inv() * uvPoint;
+    tempMat2 = rotationMatrix.inv() * ts;
     //s = 285 + tempMat2.at<double>(2,0); //285 represents the height Zconst
-    s = tempMat2.at<double>(2,0); //285 represents the height Zconst
-    cout << "s0: " << s << endl; 
-    s /= tempMat.at<double>(2,0);
-    cout << "s: " << s << endl;
-    cout << "P = " << Rs.inv() * (s * cameraMatrix.inv() * uvPoint - ts) << std::endl;
+    s = tempMat2.at<float>(2,0); //285 represents the height Zconst
+    s /= tempMat.at<float>(2,0);
+   
+    cout << "P = " << rotationMatrix.inv() * (s * cameraMatrix.inv() * uvPoint - ts) << std::endl;
     
   }
 }

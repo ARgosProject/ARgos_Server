@@ -43,7 +43,7 @@ namespace argosServer{
   }
 
   
-  void DrawCV::draw3DAxisInPoint(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Point& finger){
+  void DrawCV::draw3DAxisInPoint(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Point2f& finger){
     
     CameraModel& camera = cameraProjector.getCamera();
     
