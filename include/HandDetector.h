@@ -33,7 +33,7 @@ namespace argosServer{
      */
     ~HandDetector();
     
-    void detectFinger(const cv::Mat& currentFrame, cv::Point fingerPosition);
+    void detectFinger(const cv::Mat& currentFrame, cv::Point& fingerPosition);
     
 
     cv::Mat GetSkin(cv::Mat const &src);

@@ -17,7 +17,7 @@ namespace argosServer{
   }
   
   
-  void HandDetector::detectFinger(const cv::Mat& currentFrame, cv::Point fingerPosition){
+  void HandDetector::detectFinger(const cv::Mat& currentFrame, cv::Point& fingerPosition){
     vector<cv::Point> projectionLimits;  
     projectionLimits.push_back(cv::Point(250,184));
     projectionLimits.push_back(cv::Point(539,193));
@@ -80,20 +80,20 @@ namespace argosServer{
 	circle(detection,v,5,CV_RGB(255,0,0),-1,CV_AA,0);
       }
       
-      if (fingerTips.size() ==  1 )
-	fingerPosition =  fingerTips.back();
+      if (fingerTips.empty() )
+	fingerPosition = cv::Point(-1,-1);	
       else
-	fingerPosition = cv::Point (-1,-1);
+	fingerPosition =  fingerTips.back();
     }
     
-    imshow("original" , detection);
-    imshow("skin" , skin);
+    //imshow("original" , detection);
+    //imshow("skin" , skin);
     //imshow("H" , hsvChannels[0]);
     //imshow("H equalizate", equalizeH);
     //imshow("S" , hsvChannels[1]);
     //imshow("V" , hsvChannels[2]);
     //imshow("mask" , mask);
-    waitKey(1);
+    //waitKey(1);
     
   }
   
@@ -243,7 +243,7 @@ namespace argosServer{
 	cv::Point v=(*c);
 	if(v.x < minP.x){
 	  minP = v;
-	  cout << minP.x<<endl;
+	  //cout << minP.x<<endl;
 	}
       }
       /*
