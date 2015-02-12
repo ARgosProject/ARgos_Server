@@ -2,3 +2,4 @@
 > DrawCorners 3.0 3.0 1.0 0.0 0.0 21.0 29.7
 > DrawImage neobiz.jpg 5.64 -8.67 0.0 -4.042 4.56
 > PlaySound neobiz.wav 0
+> DrawAxis 4.0 3.0 0.0 0.0 0.0
