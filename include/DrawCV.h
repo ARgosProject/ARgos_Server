@@ -24,7 +24,7 @@ namespace argosServer{
      */
     static void draw3DAxis(cv::Mat& image, Paper& p, CameraProjectorSystem& cameraProjector);
 
-    static void draw3DAxisInPoint(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Point& finger);
+    static void draw3DAxisInPoint(cv::Mat& image, Paper& paper, CameraProjectorSystem& cameraProjector, cv::Point2f& finger);
 
     /** 
      * Draws 3D cube in center of paper
