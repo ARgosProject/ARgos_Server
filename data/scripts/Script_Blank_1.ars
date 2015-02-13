@@ -1,0 +1,2 @@
+> PlaySound iniciandoVideoConferencia.wav 0
+> InitVideostream videoconference.jpg 10.5 14.85 9999

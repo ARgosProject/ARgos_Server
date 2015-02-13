@@ -5,10 +5,17 @@
   <calibration_files camera="calibrationCamera.yml" projector="calibrationProjector.yml" extrinsics="CameraProjectorExtrinsics.yml" />
 
   <argos_papers>
-    <paper id="0" description="Neobiz" scriptFileName="NeobizScript.ars" descriptorFileName="neobiz-.jpg" />
-    <paper id="1" description="Sinovo" scriptFileName="SinovoScript.ars" descriptorFileName="sinovo-.jpg" />
-    <paper id="2" description="Active" scriptFileName="ActiveScript.ars" descriptorFileName="active-.jpg" />
-    <paper id="999" description="Blank" scriptFileName="BlankScript.ars" descriptorFileName="blank-.jpg" />
+    <paper id="0" description="Active1" scriptFileName="Script_Active_1.ars" descriptorFileName="Template_Active_1.jpg" />
+    <paper id="1" description="Neobiz1" scriptFileName="Script_Neobiz_1.ars" descriptorFileName="Template_Neobiz_1.jpg" />
+    <paper id="2" description="Operarios2" scriptFileName="Script_Operarios_1.ars" descriptorFileName="Template_Operarios_1.jpg" />
+    <paper id="3" description="Operarios1" scriptFileName="Script_Operarios_2.ars" descriptorFileName="Template_Operarios_2.jpg" />
+    <paper id="4" description="Sinovo1" scriptFileName="Script_Sinovo_1.ars" descriptorFileName="Template_Sinovo_1.jpg" />
+    <paper id="5" description="Tampo1" scriptFileName="Script_Tampo_1.ars" descriptorFileName="Template_Tampo_1.jpg" />
+    <paper id="6" description="Tampo2" scriptFileName="Script_Tampo_2.ars" descriptorFileName="Template_Tampo_2.jpg" />
+    <paper id="7" description="Textil1" scriptFileName="Script_Textil_1.ars" descriptorFileName="Template_Textil_1.jpg" />
+    <paper id="8" description="Textil2" scriptFileName="Script_Textil_2.ars" descriptorFileName="Template_Textil_2.jpg" />
+
+    <paper id="999" description="Blank1" scriptFileName="Script_Blank_1.ars" descriptorFileName="Template_Blank_1.jpg" />
   </argos_papers>
 
   <output_display type="projector" />
