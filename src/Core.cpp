@@ -66,19 +66,19 @@ namespace argosServer{
     
     
     //Finger Detection ---------
-    cv::Point fingerPoint(291,365);
+    cv::Point fingerPoint(0,0);
     //HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
     
-    cout << "fingerPoint:" << fingerPoint << endl;
+    //cout << "fingerPoint:" << fingerPoint << endl;
     
-      
-    CameraModel& camera = cameraProjector.getCamera();
+    //if(fingerPoint.x >= 0 && fingerPoint.y >= 0){  
+    //CameraModel& camera = cameraProjector.getCamera();
     //CameraModel& projector  = cameraProjector.getProjector();
     
-    cv::Point2f fingerPoint3D(-3.5954266,-16.227814);
+    //cv::Point2f fingerPoint3D(-3.5954266,-16.227814);
 
-    calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(), 
-			   camera.getDistortedIntrinsics().getCameraMatrix());
+    //calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(), 
+    //			   camera.getDistortedIntrinsics().getCameraMatrix());
     
     
     //DrawCV::draw3DAxisInPoint(currentFrame, paperDetected, cameraProjector,fingerPoint3D);
@@ -96,9 +96,7 @@ namespace argosServer{
     
     //calibrationProjector.setCandidateImagePoints(out);
 
-    //if(fingerPoint.x >= 0 && fingerPoint.y >= 0)
-    //PaperCandidates[i].calculateExtrinsics(paperSizeMeters, cameraProjector, setYPerperdicular, screenExtrinsics);
-
+    //}
 
     //ScriptManager::getInstance().update();
 

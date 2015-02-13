@@ -185,10 +185,22 @@ namespace argosServer{
     std::deque<cv::Mat> historicRot;
     std::deque<cv::Mat> historicTrans;
 
+
+    // Windows
+    string configWindow;
+    // ThresHold parameters
+    int typeThres;
+    int max_Type;
+    int max_Level;
+    // Trackbar Threshold
+    string trackbarType;
+    string trackbarParm1;
+    string trackbarParm2;
+  
     //----------------------- Filters------------------------------------------------------------
     // Threshold -------------------------------------------------------------------------------
     ThresholdMethods thresMethod;             /// Current threshold method
-    double thresParam1, thresParam2;          /// Threshold parameters
+    int thresParam1, thresParam2;          /// Threshold parameters
   
     bool acceptLinePair(Vec2f line1, Vec2f line2, float minTheta);
     Point computeIntersect(Vec2i line1, Vec2i line2);
@@ -206,7 +218,7 @@ namespace argosServer{
     // Convex Hull Contours
     float minContourValue, maxContourValue;   ///Minimum and maximum size of a contour lenght
     float contourAreaValue;
-  
+    float minContourAreaValue,  maxContourAreaValue;
     /**
      * Detection of candidates to be sheets of paper, i.e., rectangles in contours
      * This function returns in PaperCandidates all the rectangles found in a thresolded image

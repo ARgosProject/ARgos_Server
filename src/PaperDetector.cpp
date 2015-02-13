@@ -12,17 +12,36 @@ namespace argosServer{
 
   PaperDetector::PaperDetector(){
     thresMethod = CANNY;
+    // With balck panel
     //thresParam1 = 100;
-    thresParam1 = 150;
-    thresParam2 = 255;
     //thresParam2 = 60;
+    thresParam1 = 50;
+    thresParam2 = 255;
+    
     minContourValue = 0.1;
     maxContourValue = 0.8;
-    contourAreaValue = 5000;
-
+    minContourAreaValue = 41000;
+    maxContourAreaValue = 49000;
+    
     //historicWeights = {0.020,0.030,0.040,0.060,0.070,0.080,0.090,0.110,0.240,0.260};
     historicWeights = {0.05,0.05,0.10,0.30,0.50};
 
+
+    typeThres = 2;
+    max_Type = 2;
+    max_Level = 255;
+    
+    configWindow = "Configuration";
+    cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);  // configuration window
+    
+    // Trackbar Threshold
+    trackbarType = "Type:\n 0:Fixed\n1:Adapt\n2:Canny";
+    trackbarParm1 = "Parameter 1";
+    trackbarParm2 = "Parameter 2";
+
+    cv::createTrackbar(trackbarType, configWindow, &typeThres, max_Type, NULL);
+    cv::createTrackbar(trackbarParm1, configWindow, &thresParam1, max_Level, NULL);
+    cv::createTrackbar(trackbarParm2, configWindow, &thresParam2, max_Level, NULL);
   }
 
   PaperDetector::~PaperDetector(){}
@@ -52,8 +71,12 @@ namespace argosServer{
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     //cv::threshold (greyFrame, outThres, 165, 255, CV_THRESH_BINARY);
 
-    thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
-    //cv::dilate(outThres, outThres, cv::Mat(), cv::Point(-1,-1));
+    thresHold(typeThres, greyFrame, outThres, thresParam1, thresParam2);
+    //thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
+    Mat element = getStructuringElement( MORPH_RECT,
+					 Size(2,2),
+					 Point(0,0) );
+    cv::dilate(outThres, outThres, element);
     outThres.copyTo(thres2);
     //outThres.copyTo(thres0);
     //imshow("Threshold", outThres);
@@ -81,11 +104,11 @@ namespace argosServer{
     //  drawContour(debug,contours[i], CV_RGB(255,0,255));
     //imshow("debug", debug);
     
-    if (PaperCandidates.size() == 0){
-      Log::info("HoughSpace");
+    //if (PaperCandidates.size() == 0){
+    //Log::info("HoughSpace");
       // Hough Line Transform
-      houghLineTransform(thres0, PaperCandidates);
-    }
+      //  houghLineTransform(thres0, PaperCandidates);
+      //}
 
     //cv::waitKey(1);
 
@@ -211,16 +234,18 @@ namespace argosServer{
     for (size_t i = 0; i < contours.size(); i++){
       //drawContour(debug, contours[i], CV_RGB(0,255,0));
       //waitKey(1);
-      //    if(minSize < contours[i].size()  && contours[i].size() < maxSize){
-      if (cv::contourArea(contours[i]) > contourAreaValue){
-        cv::convexHull(contours[i],hull);
+      // if(minSize < contours[i].size()  && contours[i].size() < maxSize){
+      //cout << "contour Area: " << cv::contourArea(contours[i]);
+      if ((minContourAreaValue < cv::contourArea(contours[i])) && (cv::contourArea(contours[i]) < maxContourAreaValue)){
+	cv::convexHull(contours[i],hull);
         //drawContour(debug, hull, CV_RGB(255,0,0));
         //imshow("debug", debug);
         //waitKey(1);
         cv::approxPolyDP(hull, hull, double(0.1*arcLength(hull,true)),true);
 
         if(hull.size() == 4){
-          //drawApproxCurve(debug, hull, CV_RGB(0,0,255));   //blue
+	  //cout << "contour Area: " << cv::contourArea(contours[i]);
+	  //drawApproxCurve(debug, hull, CV_RGB(255,0,0));   //red
           //imshow("debug", debug);
           //waitKey(1);
           PaperCandidates.push_back(PaperCandidate());
@@ -432,7 +457,7 @@ namespace argosServer{
 
     float cross = d1.x*d2.y - d1.y*d2.x;
     //cout << "cross: " << cross<< endl;
-    if (abs(cross) < 10000)
+    if (abs(cross) < 200)
       //if (abs(cross) < /*EPS*/1e-8)
 
       return cv::Point(-1, -1);
@@ -482,8 +507,8 @@ namespace argosServer{
     projectionLimits.push_back(cv::Point(559,446));
     projectionLimits.push_back(cv::Point(228,412));
 
-    //drawApproxCurve (dst ,projectionLimits, CV_RGB(0,0,255));
-    //drawApproxCurve (dst2 ,projectionLimits, CV_RGB(0,0,255));
+    drawApproxCurve (dst ,projectionLimits, CV_RGB(0,0,255));
+    drawApproxCurve (dst2 ,projectionLimits, CV_RGB(0,0,255));
 
     //cv::Mat  image_d;
 
@@ -491,11 +516,14 @@ namespace argosServer{
     //cv::adaptiveThreshold(image, image_c, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 7, 7);
     //cv::threshold (image, image_c, 130, 255, CV_THRESH_BINARY_INV);
     //cv::blur( image, image_d, Size(3,3),Point(-1,-1));
-    cv::Canny (image, image_c, 130, 255);
-
+    cv::Canny (image, image_c,50, 255);
+    Mat element = getStructuringElement( MORPH_RECT,
+					 Size(2,2),
+					 Point(0,0) );
+    cv::dilate(image_c, image_c, element);
     //cv::dilate(image_c, image_c, cv::Mat(), cv::Point(-1,-1));
     //cv::erode(image_c, image_c, cv::Mat(), cv::Point(-1,-1));
-    //cv::imshow("thres", image_c);
+    cv::imshow("thres", image_c);
 
     std::vector<cv::Vec4i> lines;
     cv::HoughLinesP(image_c, lines, 1, CV_PI/180, 75, 3, 30 );
@@ -511,19 +539,19 @@ namespace argosServer{
       }
     }
     // Parallel Lines
-    /*
-      std::vector<cv::Vec4i> lines3;
-      for (size_t i = 0; i < lines2.size(); i++){
+    
+    std::vector<cv::Vec4i> lines3;
+    for (size_t i = 0; i < lines2.size(); i++){
       for (size_t j = i+1; j < lines2.size(); j++){
-      cv::Point pt = computeIntersect(lines2[i], lines2[j]);
-      if (pt.x < 0 && pt.y < 0){
-      //cv::line(dst, cv::Point(lines2[i][0], lines2[i][1]), cv::Point(lines2[i][2], lines2[i][3]), CV_RGB(0,255,0),3);
-      //cv::line(dst, cv::Point(lines2[j][0], lines2[j][1]), cv::Point(lines2[j][2], lines2[j][3]), CV_RGB(0,255,0),3);
-      lines3.push_back(lines2[i]);
+	cv::Point pt = computeIntersect(lines2[i], lines2[j]);
+	if (pt.x < 0 && pt.y < 0){
+	  cv::line(dst, cv::Point(lines2[i][0], lines2[i][1]), cv::Point(lines2[i][2], lines2[i][3]), CV_RGB(0,255,0),3);
+	  cv::line(dst, cv::Point(lines2[j][0], lines2[j][1]), cv::Point(lines2[j][2], lines2[j][3]), CV_RGB(0,255,0),3);
+	  lines3.push_back(lines2[i]);
+	}
       }
-      }
-      }
-    */
+    }
+    
 
     //for (size_t i = 0; i < lines2.size(); i++){
     //  cv::Vec4i v = lines2[i];
@@ -531,9 +559,9 @@ namespace argosServer{
     //}
 
     std::vector<cv::Point> corners;
-    for (size_t i = 0; i < lines2.size(); i++){
-      for (size_t j = i+1; j < lines2.size(); j++){
-        cv::Point pt = computeIntersect(lines2[i], lines2[j]);
+    for (size_t i = 0; i < lines3.size(); i++){
+      for (size_t j = i+1; j < lines3.size(); j++){
+        cv::Point pt = computeIntersect(lines3[i], lines3[j]);
         if (pt.x >= 0 && pt.y >= 0 && (pointPolygonTest(projectionLimits,pt,false) >= 0))
           corners.push_back(pt);
       }
@@ -544,7 +572,7 @@ namespace argosServer{
       cv::convexHull(corners,hull,true);
       std::vector<cv::Point> approx;
       cv::approxPolyDP(hull, approx, double(0.1*arcLength(hull,true)),true);
-      //drawApproxCurve(dst2, approx, Scalar(255,255,255));
+      drawApproxCurve(dst2, approx, Scalar(255,255,255));
 
       if(approx.size() == 4){
         //drawApproxCurve(debug, approx , CV_RGB(255,0,0));   //blue
@@ -576,10 +604,10 @@ namespace argosServer{
     //for (size_t i = 0; i < corners.size(); i++)
     //cv::circle(dst2, corners[i], 3, CV_RGB(0,0,255), 2);
 
-    //cv::imshow("image", dst);
-    //cv::imshow("image2", dst2);
+    cv::imshow("image", dst);
+    cv::imshow("image2", dst2);
     //cv::imshow("quadrilateral", quad);
-    
+    waitKey(1);
   }
 
   bool PaperDetector::isInto ( Mat &contour,vector<Point2f> &b ){
