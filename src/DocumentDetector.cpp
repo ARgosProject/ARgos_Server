@@ -12,21 +12,18 @@ using namespace cv;
 namespace argosServer{
 
   DocumentDetector::DocumentDetector(){
-    // Default Configuration
-    //const string fileWithQueryImages = "./queryImages.txt";
-
     // Create Feature Detectors and Descriptors
     createDetectorDescriptorMatcher();
-
+    
     queryImagesNames = ConfigManager::getDescriptorsList();
   }
-
+  
   DocumentDetector::~DocumentDetector(){}
-
+  
   void DocumentDetector::setImagesPath(const string& path) {
     imagesPath = path;
   }
-
+  
   void DocumentDetector::configure() {
     // Read query images
     readImages();
@@ -34,7 +31,7 @@ namespace argosServer{
     //Extracting keypoints from query images
     featureDetector->detect( queryImages, queryKeypoints );
     Log::success("Extracting keypoints from images... [OK]");
-
+    
     //Compute descriptor from query images
 
     descriptorExtractor->compute( queryImages, queryKeypoints, queryDescriptors );
@@ -52,7 +49,7 @@ namespace argosServer{
 }
 
   /**
-   * Main detection function. Performs all steps
+   * Main detection function. 
    */
   void DocumentDetector::detect(const cv::Mat& trainFrame, vector<Paper>& detectedPapers){
     
@@ -88,6 +85,7 @@ namespace argosServer{
       //imshow("trainFrame",paperContent);
       //waitKey(1);
       
+
 
       // extract feautures and compute descriptors of current frame
       featureDetector->detect(paperContent, trainKeypoints );
@@ -150,7 +148,8 @@ namespace argosServer{
     return isCreated;
   }
 
-  void DocumentDetector::readQueryFilenames(const string& filename, string& dirName, vector<string>& queryFilenames){
+  /*
+    void DocumentDetector::readQueryFilenames(const string& filename, string& dirName, vector<string>& queryFilenames){
     queryFilenames.clear();
 
     ifstream file( filename.c_str() );
@@ -172,20 +171,21 @@ namespace argosServer{
     }
     file.close();
   }
-
+  */
+  
   bool DocumentDetector::readImages(){
     /*
       cout << "< Reading the images..." << endl;
       string queryDirName;
       readQueryFilenames(queryFilename, queryDirName, queryImageNames);
-
+      
       if(queryImageNames.empty() ){
       cout << "Query image filenames can not be read." << endl << ">" << endl;
       return false;
       }
     */
-
-
+    
+    
     int readImageCount = 0;
     for( size_t i = 0; i < queryImagesNames.size(); i++ ){
       string filename = queryImagesNames[i];
@@ -196,15 +196,15 @@ namespace argosServer{
         readImageCount++;
       queryImages.push_back(img);
     }
-
+    
     if(!readImageCount){
       Log::error("All query images can not be read.");
       return false;
     }
     else
       Log::success(to_string(readImageCount) + " query images were read.");
-
-
+    
+    
     return true;
   }
 

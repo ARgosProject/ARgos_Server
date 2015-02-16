@@ -1,6 +1,6 @@
 /**
    @file PaperDetector.h
-   @brief 
+   @brief
    @author Manuel Hervas
    @date 06/2014
 */
@@ -21,7 +21,7 @@ using namespace std;
  * ARgos server side
  */
 namespace argosServer{
-  
+
   /**
    * Represent a candidate to be a sheet of paper
    */
@@ -29,40 +29,40 @@ namespace argosServer{
   public:
     vector<cv::Point> contour;  /// All the points of its contour
     int idx;                    /// Index position in the global contour list
-    
+
     /**
-     * Default constructor 
+     * Default constructor
      */
     PaperCandidate(){}
-    
-    PaperCandidate(const Paper &P): Paper(P){} 
-    
+
+    PaperCandidate(const Paper &P): Paper(P){}
+
     PaperCandidate(const  PaperCandidate &P): Paper(P){
       contour = P.contour;
       idx = P.idx;
     }
-    
+
     PaperCandidate(cv::Size S): Paper(S){}
-    
+
   };
-  
+
   /**
    * Main class for paper detection
    */
   class PaperDetector: public Singleton<PaperDetector> {
-  
+
   public:
-  
+
     /**
-     * Default constructor 
+     * Default constructor
      */
     PaperDetector();
-  
+
     /**
      * Default destructor
      */
     ~PaperDetector();
-    
+
     /**
      * Detects the sheet of papers in the image passed
      * With the information about the camera parameters and the size of the marker, the extrinsics of the paper are detected
@@ -74,22 +74,22 @@ namespace argosServer{
      * @param setYPerpendicular set Y axis perpendicular to paper
      * @param screenExtrinsics calculate extrinsics parameters for display in screen or projector
      */
- 
+
     void detect (const cv::Mat& currentFrame, std::vector<Paper>& detectedPapers, CameraProjectorSystem& camProjector,
-		 cv::Size paperSizeMeters, bool screenExtrinsics,  bool setYPerpendicular = false) throw (cv::Exception);
-  
+     cv::Size paperSizeMeters, bool screenExtrinsics,  bool setYPerpendicular = false) throw (cv::Exception);
+
     /**
      *  Sets the type of thresholding methods available
      */
     enum ThresholdMethods {FIXED_THRES,ADPT_THRES,CANNY};
-  
+
     /**
      * Sets the threshold method
      */
     void setThresholdMethod(ThresholdMethods m) {
       thresMethod = m;
     }
-  
+
     /**
      * Returns the current threshold method
      */
@@ -107,7 +107,7 @@ namespace argosServer{
       thresParam1 = param1;
       thresParam2 = param2;
     }
-  
+
     /**
      * Sets the parameters of the threshold method
      * We are currently using the Adptive threshold ee opencv doc of adaptiveThreshold for more info
@@ -118,8 +118,8 @@ namespace argosServer{
       param1 = thresParam1;
       param2 = thresParam2;
     }
-  
-  
+
+
     /**
      * Returns a reference to the internal image thresholded. It is for visualization purposes and to adjust manually
      * the parameters
@@ -127,11 +127,11 @@ namespace argosServer{
     const cv::Mat  & getThresFrame(){
       return outThres;
     }
-  
+
     const cv::Mat &  getDebugFrame(){
       return debug;
     }
-    
+
     /**
      * Specifies the min and max sizes of the markers as a fraction of the image size. By size we mean the maximum
      * of cols and rows.
@@ -139,49 +139,49 @@ namespace argosServer{
      * @param max size of the contour to consider a possible marker as valid [0,1)
      */
     void setMinMaxSize(float min=0.03,float max=0.5)throw(cv::Exception);
-    
+
     void setContourArea(float area=5000.0)throw(cv::Exception);
-    
+
     /**
      * Reads the min and max sizes employed
      * @param min output size of the contour to consider a possible marker as valid (0,1]
      * @param max output size of the contour to consider a possible marker as valid [0,1)
      */
     void getMinMaxSize(float &min,float &max){min=minContourValue; max=maxContourValue;}
-    
+
     void getContourArea(float &area){area=contourAreaValue;}
-    
+
     /**
      * Thesholds the passed image with the specified method.
      */
     void thresHold(int method, const Mat &grey, Mat &out, double param1, double param2) throw (cv::Exception);
-  
+
     /**
      * Detection of candidates to be markers, i.e., rectangles.
      * This function returns in candidates all the rectangles found in a thresolded image
      */
     void detectRectangles(const cv::Mat &thresImg, vector<std::vector<cv::Point2f> > & candidates);
-    
+
     /**
      * Refine PaperCandidate Corner using LINES method
      * @param candidate candidate to refine corners
      */
-    void refineCandidateLines(PaperCandidate &candidate);    
-    
+    void refineCandidateLines(PaperCandidate &candidate);
+
     cv::Mat calculateAverage(std::deque<cv::Mat> &matrix);
 
 
-   
+
 
 
   private:
     // Images
-    cv::Mat currentFrame;		      /// current frame
+    cv::Mat currentFrame;         /// current frame
     cv::Mat greyFrame;                        /// grey frame
     cv::Mat debug;                            /// debug frame
     cv::Mat outThres,thres2;                  /// threshold frame
-    //vector<cv::Mat> warpVector;             //  warp Vector 
-    vector<float> historicWeights;            // 
+    //vector<cv::Mat> warpVector;             //  warp Vector
+    vector<float> historicWeights;            //
     std::deque<cv::Mat> historicRot;
     std::deque<cv::Mat> historicTrans;
 
@@ -196,16 +196,16 @@ namespace argosServer{
     string trackbarType;
     string trackbarParm1;
     string trackbarParm2;
-  
+
     //----------------------- Filters------------------------------------------------------------
     // Threshold -------------------------------------------------------------------------------
     ThresholdMethods thresMethod;             /// Current threshold method
     int thresParam1, thresParam2;          /// Threshold parameters
-  
+
     bool acceptLinePair(Vec2f line1, Vec2f line2, float minTheta);
     Point computeIntersect(Vec2i line1, Vec2i line2);
     vector<Point> lineToPointPair(Vec2i line);
-    
+
     void houghLineTransform(cv::Mat& image, vector<PaperCandidate> &PaperCandidates);
     Point computeIntersect(cv::Vec4i a, cv::Vec4i b);
     void sortCorners(std::vector<cv::Point2f>& corners, cv::Point2f center);
@@ -224,20 +224,20 @@ namespace argosServer{
      * This function returns in PaperCandidates all the rectangles found in a thresolded image
      */
     void findRectangles(vector<vector<cv::Point> > &contours, vector<PaperCandidate> &PaperCandidates);
-    
+
     /**
-     * Detection of candidates to be sheets of paper through Convex Hull contours 
+     * Detection of candidates to be sheets of paper through Convex Hull contours
      * This function returns in PaperCandidates all the rectangles found in a thresolded image
      */
     void convexHullContours(vector<vector<cv::Point> > &contours, vector<PaperCandidate> &PaperCandidates);
 
 
     //-Utils-----------------------------------------------------------------------------------------
-  
+
     /**
      */
     bool isInto(cv::Mat &contour,vector<cv::Point2f> &b);
-  
+
     /**
      */
     int perimeter(vector<cv::Point2f> &a);
@@ -245,9 +245,11 @@ namespace argosServer{
     double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 
     bool warp(cv::Mat &in, cv::Mat &out, cv::Size size, vector<Point2f> points) throw ( cv::Exception );
-   
+
+    float length(cv::Vec4i v);
+    float angleBetween2Lines(cv::Vec4i line1, cv::Vec4i line2);
     /**
-     * Given a vector vinout with elements and a boolean vector indicating the elements from it to remove, 
+     * Given a vector vinout with elements and a boolean vector indicating the elements from it to remove,
      * this function remove the elements
      * @param vinout input vector
      * @param toRemove boolean vector indicating which elements should be eliminated
@@ -257,14 +259,14 @@ namespace argosServer{
       //remove the invalid ones by setting the valid in the positions left by the invalids
       size_t indexValid=0;
       for (size_t i=0;i<toRemove.size();i++) {
-	if (!toRemove[i]) {
-	  if (indexValid!=i) vinout[indexValid]=vinout[i];
-	  indexValid++;
-	}
+  if (!toRemove[i]) {
+    if (indexValid!=i) vinout[indexValid]=vinout[i];
+    indexValid++;
+  }
       }
       vinout.resize(indexValid);
     }
-  
+
     //-Graphical debug
     void drawApproxCurve(cv::Mat &in,vector<Point> &contour,cv::Scalar color);
     void drawContour(cv::Mat &in,vector<Point>  &contour,cv::Scalar color);
@@ -273,5 +275,5 @@ namespace argosServer{
     void drawApproxCurve ( Mat &in,vector<Point2f>  &contour,Scalar color );
   };
 }
-  
+
 #endif
