@@ -14,16 +14,16 @@ namespace argosServer{
   DocumentDetector::DocumentDetector(){
     // Create Feature Detectors and Descriptors
     createDetectorDescriptorMatcher();
-    
+
     queryImagesNames = ConfigManager::getDescriptorsList();
   }
-  
+
   DocumentDetector::~DocumentDetector(){}
-  
+
   void DocumentDetector::setImagesPath(const string& path) {
     imagesPath = path;
   }
-  
+
   void DocumentDetector::configure() {
     // Read query images
     readImages();
@@ -31,7 +31,7 @@ namespace argosServer{
     //Extracting keypoints from query images
     featureDetector->detect( queryImages, queryKeypoints );
     Log::success("Extracting keypoints from images... [OK]");
-    
+
     //Compute descriptor from query images
 
     descriptorExtractor->compute( queryImages, queryKeypoints, queryDescriptors );
@@ -46,45 +46,47 @@ namespace argosServer{
       fs.release();
       cout << ">" << endl;
     */
-}
+  }
 
   /**
-   * Main detection function. 
+   * Main detection function.
    */
   void DocumentDetector::detect(const cv::Mat& trainFrame, vector<Paper>& detectedPapers){
-    
+
     double  distance_0_1;
     double  distance_1_2;
     double  distance_2_3;
     double  distance_3_0;
-    
+
+    //imshow("trainFrame",trainFrame );
+    //waitKey(1);
+
     for (unsigned int i=0; i<detectedPapers.size(); i++){
+
       distance_0_1 = cv::norm( (detectedPapers[i])[0] - (detectedPapers[i])[1] );
       distance_1_2 = cv::norm( (detectedPapers[i])[1] - (detectedPapers[i])[2] );
       distance_2_3 = cv::norm( (detectedPapers[i])[2] - (detectedPapers[i])[3] );
       distance_3_0 = cv::norm( (detectedPapers[i])[3] - (detectedPapers[i])[0] );
-      
+
       //cout << "distance_0_1: "<<  distance_0_1 << endl;
       //cout << "distance_1_2: "<<  distance_1_2 << endl;
       //cout << "distance_2_3: "<<  distance_2_3 << endl;
       //cout << "distance_3_0: "<<  distance_3_0 << endl;
-      
+
       //cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
       //cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
 
 
       if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0) )
-	warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+        warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+      //warp(trainFrame,paperContent,Size(278,180), detectedPapers[i]);
       else
-	warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      
-      //if (detectedPapers[i].getTransVec().at<float>(0) > 0)
-      //warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
-      //else
-      //warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      //imshow("trainFrame",paperContent);
+        warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
+      //warp(trainFrame,paperContent,Size(180,278), detectedPapers[i]);
+
+      //imshow("paperContent", paperContent);
       //waitKey(1);
-      
+
 
 
       // extract feautures and compute descriptors of current frame
@@ -132,12 +134,13 @@ namespace argosServer{
         }
       }
     }
+
   }
 
 
   bool DocumentDetector::createDetectorDescriptorMatcher(){
     Log::info("Creating feature detector, descriptor extractor and descriptor matcher ...");
-    featureDetector = new cv::SurfFeatureDetector(2000,4);
+    featureDetector = new cv::SurfFeatureDetector(5000,4);
     descriptorExtractor = new cv::SurfDescriptorExtractor();
     descriptorMatcher = cv::Ptr<cv::DescriptorMatcher>(new cv::FlannBasedMatcher(cv::Ptr<cv::flann::IndexParams>(new cv::flann::KDTreeIndexParams())));
 
@@ -154,38 +157,38 @@ namespace argosServer{
 
     ifstream file( filename.c_str() );
     if ( !file.is_open() )
-      return;
+    return;
 
     size_t pos = filename.rfind('\\');
     char dlmtr = '\\';
     if (pos == String::npos){
-      pos = filename.rfind('/');
-      dlmtr = '/';
+    pos = filename.rfind('/');
+    dlmtr = '/';
     }
     dirName = pos == string::npos ? "" : filename.substr(0, pos) + dlmtr;
 
     while( !file.eof() ){
-      string str; getline( file, str );
-      if( str.empty() ) break;
-      queryFilenames.push_back(str);
+    string str; getline( file, str );
+    if( str.empty() ) break;
+    queryFilenames.push_back(str);
     }
     file.close();
-  }
+    }
   */
-  
+
   bool DocumentDetector::readImages(){
     /*
       cout << "< Reading the images..." << endl;
       string queryDirName;
       readQueryFilenames(queryFilename, queryDirName, queryImageNames);
-      
+
       if(queryImageNames.empty() ){
       cout << "Query image filenames can not be read." << endl << ">" << endl;
       return false;
       }
     */
-    
-    
+
+
     int readImageCount = 0;
     for( size_t i = 0; i < queryImagesNames.size(); i++ ){
       string filename = queryImagesNames[i];
@@ -196,15 +199,15 @@ namespace argosServer{
         readImageCount++;
       queryImages.push_back(img);
     }
-    
+
     if(!readImageCount){
       Log::error("All query images can not be read.");
       return false;
     }
     else
       Log::success(to_string(readImageCount) + " query images were read.");
-    
-    
+
+
     return true;
   }
 
