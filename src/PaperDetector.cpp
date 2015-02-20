@@ -79,8 +79,8 @@ namespace argosServer{
     cv::dilate(outThres, outThres, element);
     outThres.copyTo(thres2);
     outThres.copyTo(thres0);
-    imshow("Threshold", outThres);
-    waitKey(1);
+    //imshow("Threshold", outThres);
+    //waitKey(1);
 
     //find all rectangles in the thresholdes image
     vector<PaperCandidate> PaperCandidates;

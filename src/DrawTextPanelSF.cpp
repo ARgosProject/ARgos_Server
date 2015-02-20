@@ -20,8 +20,6 @@ namespace argosServer {
     // Text
     size += com.addChars(args[4].c_str(), 32);
 
-    std::cout << args[4].c_str() << std::endl;
-
     // Position
     for(int i = 5; i < 8; ++i)
       size += com.addFloat(getArgAsFloat(args[i]));

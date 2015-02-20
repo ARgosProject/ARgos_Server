@@ -81,14 +81,11 @@ namespace argosServer {
     vector<cv::Point2f> out;
 
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
-    cout << "fingerPoint:" << fingerPoint << endl;
+    //cout << "fingerPoint:" << fingerPoint << endl;
 
     if(pointPolygonTest(projectionLimits,fingerPoint,false) >= 0) {
       //CameraModel& camera = cameraProjector.getCamera();
       CameraModel& projector  = cameraProjector.getProjector();
-
-      //fingerMat = calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
-      //                                 camera.getDistortedIntrinsics().getCameraMatrix());
 
       fingerMat = calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
                                           projector.getDistortedIntrinsics().getCameraMatrix());
@@ -97,7 +94,7 @@ namespace argosServer {
       //cout << "fingerMat:" << fingerMat << endl;
       fingerPoint3D = cv::Point2f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1));
       point3f =  cv::Point3f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1), fingerMat.at<float>(0,2));
-      cout << "finger3D:" << fingerPoint3D << endl;
+      //cout << "finger3D:" << fingerPoint3D << endl;
 
       /*
         vector<cv::Point3f> objectPoints;
@@ -134,7 +131,7 @@ namespace argosServer {
         numFrames = 0;
       }
       else {
-        if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
+        //if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
           isPreviousPaperDetected = true;
           numFrames = 0;
           previousNumInvoices = numInvoices;
@@ -148,7 +145,7 @@ namespace argosServer {
             invoicesIndex.push_back(paperList[i].getId());
             //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
           }
-        }
+          //}
       }
     }
 
@@ -157,7 +154,7 @@ namespace argosServer {
       paperList[i].setId(invoicesIndex[i]);
       paperList[i].setFingerPoint(fingerPoint3D);
     }
-
+    //paperList.clear();
     return paperList;
 
   }

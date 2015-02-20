@@ -58,7 +58,11 @@ namespace argosServer{
     double  distance_2_3;
     double  distance_3_0;
 
+    imshow("trainFrame",trainFrame );
+    waitKey(1);
+
     for (unsigned int i=0; i<detectedPapers.size(); i++){
+
       distance_0_1 = cv::norm( (detectedPapers[i])[0] - (detectedPapers[i])[1] );
       distance_1_2 = cv::norm( (detectedPapers[i])[1] - (detectedPapers[i])[2] );
       distance_2_3 = cv::norm( (detectedPapers[i])[2] - (detectedPapers[i])[3] );
@@ -75,15 +79,13 @@ namespace argosServer{
 
       if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0) )
         warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+      //warp(trainFrame,paperContent,Size(278,180), detectedPapers[i]);
       else
         warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
+      //warp(trainFrame,paperContent,Size(180,278), detectedPapers[i]);
 
-      //if (detectedPapers[i].getTransVec().at<float>(0) > 0)
-      //warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
-      //else
-      //warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      //imshow("trainFrame",paperContent);
-      //waitKey(1);
+      imshow("paperContent", paperContent);
+      waitKey(1);
 
 
 
@@ -94,7 +96,7 @@ namespace argosServer{
 
       if (trainDescriptors.empty() || trainDescriptors.rows == 1){
         //cout <<  "trainDescriptors empty "<< endl;
-        //cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
+        cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
         detectedPapers[i].setId(999);
         //cout <<  "detectedPapers["<< i <<"]="<< detectedPapers[i].getId()<< endl;
       }
@@ -102,14 +104,14 @@ namespace argosServer{
         if (trainDescriptors.type() != 0 ){
           for(size_t j=0; j < queryDescriptors.size(); j++){
             vector<DMatch> good_matches;
-            //cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
+            cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
             descriptorMatcher->knnMatch(queryDescriptors[j], trainDescriptors, matches, 2);
             for(unsigned int k=0; k<matches.size(); k++){
               // Apply NNDR
               if(matches.at(k).at(0).distance <= 0.8 * matches.at(k).at(1).distance)
                 good_matches.push_back(matches[k][0]);
             }
-            //cout <<  "Good Matches: " << good_matches.size() << endl;
+            cout <<  "Good Matches: " << good_matches.size() << endl;
             elements_matches.push_back(good_matches);
           }
         }
@@ -132,12 +134,13 @@ namespace argosServer{
         }
       }
     }
+
   }
 
 
   bool DocumentDetector::createDetectorDescriptorMatcher(){
     Log::info("Creating feature detector, descriptor extractor and descriptor matcher ...");
-    featureDetector = new cv::SurfFeatureDetector(2000,4);
+    featureDetector = new cv::SurfFeatureDetector(3000,4);
     descriptorExtractor = new cv::SurfDescriptorExtractor();
     descriptorMatcher = cv::Ptr<cv::DescriptorMatcher>(new cv::FlannBasedMatcher(cv::Ptr<cv::flann::IndexParams>(new cv::flann::KDTreeIndexParams())));
 
