@@ -31,8 +31,8 @@ namespace argosServer{
     max_Type = 2;
     max_Level = 255;
 
-    configWindow = "Configuration";
-    cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);  // configuration window
+    //configWindow = "Configuration";
+    //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);  // configuration window
 
     // Trackbar Threshold
     trackbarType = "Type:\n 0:Fixed\n1:Adapt\n2:Canny";
@@ -500,10 +500,10 @@ namespace argosServer{
     //dst2 = Scalar::all(0);
 
     vector<cv::Point> projectionLimits;
-    projectionLimits.push_back(cv::Point(266,187));
-    projectionLimits.push_back(cv::Point(542,213));
-    projectionLimits.push_back(cv::Point(534,445));
-    projectionLimits.push_back(cv::Point(218,415));
+    projectionLimits.push_back(cv::Point(266,102));
+    projectionLimits.push_back(cv::Point(554,100));
+    projectionLimits.push_back(cv::Point(565,338));
+    projectionLimits.push_back(cv::Point(250,338));
 
     //drawApproxCurve (dst, projectionLimits, CV_RGB(0,0,255));
 

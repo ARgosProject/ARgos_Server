@@ -58,6 +58,8 @@ namespace argosServer {
     //Detection of papers in the image passed
     PaperDetector::getInstance().detect(currentFrame, paperList, cameraProjector,
                                         ConfigManager::getPaperSize(), ConfigManager::getOutputDisplay());
+    //imshow("Screen", currentFrame);
+    //cv::waitKey(1);
 
     Paper paperDetected;
     if(!paperList.empty()) {
@@ -69,7 +71,7 @@ namespace argosServer {
 
     //Finger Detection ---------
     cv::Point fingerPoint(0,0);
-    //HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
+    HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
 
     //cout << "fingerPoint:" << fingerPoint << endl;
 
