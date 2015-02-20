@@ -13,7 +13,7 @@ namespace argosServer {
 
   HandDetector::HandDetector() {
 
-    configWindow = "Configuration";
+    //configWindow = "Configuration";
 
     //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);       // configuration window
 

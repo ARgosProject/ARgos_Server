@@ -74,12 +74,11 @@ namespace argosServer{
     //thresHold(2, greyFrame, outThres, thresParam1, thresParam2);
     //thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
     Mat element = getStructuringElement( MORPH_RECT,
-                                         Size(1.5,1.5),
-                                         Point(0,0) );
+                                         Size(2,2));
     cv::dilate(outThres, outThres, element);
     outThres.copyTo(thres2);
     outThres.copyTo(thres0);
-    //imshow("Threshold", outThres);
+    // imshow("Threshold", outThres);
     //waitKey(1);
 
     //find all rectangles in the thresholdes image

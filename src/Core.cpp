@@ -75,13 +75,14 @@ namespace argosServer {
 
     //Finger Detection ---------
     cv::Mat fingerMat;
+
     cv::Point fingerPoint(0,0);
     cv::Point2f fingerPoint3D;
     cv::Point3f point3f;
     vector<cv::Point2f> out;
 
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
-    //cout << "fingerPoint:" << fingerPoint << endl;
+    cout << "fingerPoint:" << fingerPoint << endl;
 
     if(pointPolygonTest(projectionLimits,fingerPoint,false) >= 0) {
       //CameraModel& camera = cameraProjector.getCamera();
@@ -90,11 +91,11 @@ namespace argosServer {
       fingerMat = calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
                                           projector.getDistortedIntrinsics().getCameraMatrix());
 
-
       //cout << "fingerMat:" << fingerMat << endl;
       fingerPoint3D = cv::Point2f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1));
-      point3f =  cv::Point3f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1), fingerMat.at<float>(0,2));
-      //cout << "finger3D:" << fingerPoint3D << endl;
+      fingerPoint3D = fingerPoint3D * (-1);
+      //point3f =  cv::Point3f((fingerMat.at<float>(0,0)), fingerMat.at<float>(0,1), fingerMat.at<float>(0,2));
+      cout << "finger3D:" << fingerPoint3D << endl;
 
       /*
         vector<cv::Point3f> objectPoints;
@@ -107,7 +108,7 @@ namespace argosServer {
                         out);
       */
     }
-    //DrawCV::draw3DAxisInPoint(currentFrame, paperDetected, cameraProjector,fingerPoint3D);
+    //DrawCV::draw3DAxisInPoint(currentFrame, paperDetected, cameraProjector,fingerPoint3D2);
     //cout << "out: " << out << endl;
     //cv::imshow("Test", currentFrame);
     //cv::waitKey(1);
@@ -131,7 +132,7 @@ namespace argosServer {
         numFrames = 0;
       }
       else {
-        //if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
+        if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
           isPreviousPaperDetected = true;
           numFrames = 0;
           previousNumInvoices = numInvoices;
@@ -145,7 +146,7 @@ namespace argosServer {
             invoicesIndex.push_back(paperList[i].getId());
             //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
           }
-          //}
+        }
       }
     }
 
