@@ -45,15 +45,41 @@ namespace argosServer {
   void ScriptSentence::decouple(const std::string& scriptSentence) {
     std::string token;
     std::istringstream parser(scriptSentence);
-    parser.ignore(1); // Ignore '>' character
 
-    parser >> std::ws;
-    std::getline(parser, _command, ' '); // Command name
+    // Ignore the '>' character
+    parser.ignore(1);
 
+    // Command name
     parser >> std::ws;
+    std::getline(parser, _command, ' ');
+
+    // Arguments
+    parser >> std::ws;
+    std::string ss = "";
+    bool glue = false;
     while(std::getline(parser, token, ' ')) {
-      _args.push_back(token.c_str()); // Arguments
+      if(token.find("\"") != std::string::npos) {
+        ss += token + " ";
+        if(glue) {
+          glue = false;
+
+          ss[0] = ss[ss.length()-1] = ss[ss.length()-2]= '\0';
+          _args.push_back(ss);
+          ss = "";
+        }
+        else {
+          glue = true;
+        }
+      }
+      else {
+        _args.push_back(token.c_str());
+      }
+
       parser >> std::ws;
+    }
+
+    for(auto& s : _args) {
+      std::cout << s << std::endl;
     }
   }
 
