@@ -46,6 +46,10 @@ namespace argosServer {
     previousNumInvoices = 0;
     initVideoConference = false;
 
+    projectionLimits.push_back(cv::Point(266,102));
+    projectionLimits.push_back(cv::Point(554,100));
+    projectionLimits.push_back(cv::Point(565,338));
+    projectionLimits.push_back(cv::Point(250,338));
   }
 
   Core::~Core() {
@@ -70,36 +74,46 @@ namespace argosServer {
 
 
     //Finger Detection ---------
+    cv::Mat fingerMat;
     cv::Point fingerPoint(0,0);
+    cv::Point2f fingerPoint3D;
+    cv::Point3f point3f;
+    vector<cv::Point2f> out;
+
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
+    cout << "fingerPoint:" << fingerPoint << endl;
 
-    //cout << "fingerPoint:" << fingerPoint << endl;
+    if(pointPolygonTest(projectionLimits,fingerPoint,false) >= 0) {
+      //CameraModel& camera = cameraProjector.getCamera();
+      CameraModel& projector  = cameraProjector.getProjector();
 
-    //if(fingerPoint.x >= 0 && fingerPoint.y >= 0){
-    //CameraModel& camera = cameraProjector.getCamera();
-    //CameraModel& projector  = cameraProjector.getProjector();
+      //fingerMat = calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
+      //                                 camera.getDistortedIntrinsics().getCameraMatrix());
 
-    //cv::Point2f fingerPoint3D(-3.5954266,-16.227814);
-
-    //calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
-    //         camera.getDistortedIntrinsics().getCameraMatrix());
+      fingerMat = calculate3DPointFrom2D(fingerPoint, paperDetected.getRotVec(),paperDetected.getTransVec(),
+                                          projector.getDistortedIntrinsics().getCameraMatrix());
 
 
+      //cout << "fingerMat:" << fingerMat << endl;
+      fingerPoint3D = cv::Point2f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1));
+      point3f =  cv::Point3f(fingerMat.at<float>(0,0), fingerMat.at<float>(0,1), fingerMat.at<float>(0,2));
+      cout << "finger3D:" << fingerPoint3D << endl;
+
+      /*
+        vector<cv::Point3f> objectPoints;
+        objectPoints.push_back(point3f);
+
+        cv::projectPoints(objectPoints,
+        cameraProjector.getCamToProjRotation(), cameraProjector.getCamToProjTranslation(),
+                        projector.getDistortedIntrinsics().getCameraMatrix(),
+                        projector.getDistCoeffs(),
+                        out);
+      */
+    }
     //DrawCV::draw3DAxisInPoint(currentFrame, paperDetected, cameraProjector,fingerPoint3D);
+    //cout << "out: " << out << endl;
     //cv::imshow("Test", currentFrame);
     //cv::waitKey(1);
-
-
-    //vector<cv::Point2f> out;
-
-    //cv::projectPoints(cv::Mat(ObjPoints),
-    //          cameraProjector.getRotObjToProj(), cameraProjector.getTransObjToProj(),
-    //            projector.getDistortedIntrinsics().getCameraMatrix(),
-    //          projector.getDistCoeffs(),
-    //          out);
-
-    //calibrationProjector.setCandidateImagePoints(out);
-
     //}
 
     //ScriptManager::getInstance().update();
@@ -141,7 +155,7 @@ namespace argosServer {
     for (unsigned int i=0; i < paperList.size(); i++) {
       Log::info(std::to_string(invoicesIndex[i]));
       paperList[i].setId(invoicesIndex[i]);
-      paperList[i].setFingerPoint(fingerPoint);
+      paperList[i].setFingerPoint(fingerPoint3D);
     }
 
     return paperList;
@@ -181,7 +195,7 @@ namespace argosServer {
   }
 
 
-  void Core::calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& camMatrix) {
+  cv::Mat Core::calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& camMatrix) {
     Mat_<float> cameraMatrix(camMatrix);
     cv::Mat rotationMatrix(3,3,cv::DataType<float>::type);
     cv::Rodrigues(Rs,rotationMatrix);
@@ -196,7 +210,8 @@ namespace argosServer {
     tempMat2 = rotationMatrix.inv() * ts;
     s = 0 + tempMat2.at<float>(2,0); // 0 represents the height Zconst
     s /= tempMat.at<float>(2,0);
-
-    cout << "P = " << rotationMatrix.inv() * (s * cameraMatrix.inv() * uvPoint - ts) << std::endl;
+    cv::Mat point3d =  rotationMatrix.inv() * (s * cameraMatrix.inv() * uvPoint - ts);
+    //cout << "Mat" << point3d << endl;
+    return point3d;
   }
 }

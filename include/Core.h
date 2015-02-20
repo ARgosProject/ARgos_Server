@@ -51,8 +51,8 @@ namespace argosServer {
 
     void checkRegion(cv::Mat& currentFrame,vector<Paper>& detectedPapers);
     bool warp (const cv::Mat& in, cv::Mat& out, Size size, vector<Point2f> points ) throw ( cv::Exception );
-   
-    void calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& cameraMatrix);
+
+    cv::Mat calculate3DPointFrom2D(const cv::Point& ps, const cv::Mat& Rs, const cv::Mat& ts, const cv::Mat& cameraMatrix);
 
   private:
     cv::Mat currentFrame;                 ///<  Current frame
@@ -78,7 +78,7 @@ namespace argosServer {
     int previousNumInvoices;
 
     bool initVideoConference;
-
+    vector<cv::Point> projectionLimits;
   };
 }
 
