@@ -4,12 +4,12 @@
 > DrawHighlight  1.00 0.00 0.00  -4.80  8.60  0.00   2.30 0.40
 > DrawHighlight  1.00 1.00 0.00  -4.80  8.00  0.00   2.30 0.40
 
-# Buttons (De momento imágenes)
-> DrawImage hand_button.png -9.00 -4.25 0.00 -1.50 1.50
-> DrawImage hand_button.png -9.00  2.25 0.00 -1.50 1.50
+# Buttons
+> DrawImage HandButton.jpg -9.00 -4.25 0.00 -1.50 1.50
+> DrawImage HandButton.jpg -9.00  2.25 0.00 -1.50 1.50
 
-# Videos (De momento highlights)
-> DrawHighlight  1.00 0.00 1.00   -2.85  3.15  0.00   3.50 1.80
+# Videos
+> DrawHighlight  1.00 0.00 1.00   -2.85   3.15  0.00  3.50 1.80
 > DrawHighlight  1.00 0.00 1.00   -2.85  -3.75  0.00  3.50 1.80
 
 # Sounds

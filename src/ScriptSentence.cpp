@@ -63,7 +63,7 @@ namespace argosServer {
         if(glue) {
           glue = false;
 
-          ss[0] = ss[ss.length()-1] = ss[ss.length()-2]= '\0';
+          ss = ss.substr(1, ss.size()-3);
           _args.push_back(ss);
           ss = "";
         }
@@ -72,14 +72,10 @@ namespace argosServer {
         }
       }
       else {
-        _args.push_back(token.c_str());
+        _args.push_back(token);
       }
 
       parser >> std::ws;
-    }
-
-    for(auto& s : _args) {
-      std::cout << s << std::endl;
     }
   }
 

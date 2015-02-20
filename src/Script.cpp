@@ -66,6 +66,9 @@ namespace argosServer {
           // Command - Process it
           _sentences.push_back(ScriptSentence(line));
           break;
+        case '@':
+          // Event handler
+          break;
         }
       }
     } catch(const std::exception& e) {

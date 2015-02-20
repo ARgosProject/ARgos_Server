@@ -1,3 +1,12 @@
-#                 R   G   B  FS   T E X T       X    Y   Z      W     H
-> DrawTextPanel 0.0 1.0 0.0  72  "A: 0007"  -5.25 -2.8 0.0  300.0 200.0
-#> PlaySound operarios.wav 0
+# Highlights        R    G    B      X     Y     Z      W    H
+> DrawHighlight  1.00 0.00 0.00   0.00  0.00  0.00   1.25 0.40
+> DrawHighlight  1.00 0.00 0.00   0.00  5.00  0.00   1.25 0.40
+
+# Buttons
+> DrawImage VideoButton.jpg -9.00 -4.25 0.00 -1.50 1.50
+
+# Images
+> DrawImage HJM7.jpg -9.00 8.25 0.00 -1.50 1.50
+
+# Sounds
+> PlaySound HJM7.wav 0
