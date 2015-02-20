@@ -3,8 +3,8 @@
 > DrawHighlight  1.00 0.00 0.00   3.10  3.50  0.00   4.25 0.40
 
 # Buttons
-> DrawImage VideoButton.jpg -9.50 -2.00 0.00 -1.25 1.25
-> DrawImage VideoButton.jpg -9.50  3.75 0.00 -1.25 1.25
+> DrawImage VideoButton.jpg -9.25 -2.00 0.00 -1.00 1.00
+> DrawImage VideoButton.jpg -9.25  3.75 0.00 -1.00 1.00
 
 # Images
 > DrawImage HJM7.jpg -6.00 10.65 0.00 -2.36 1.03
