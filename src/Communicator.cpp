@@ -168,7 +168,7 @@ namespace argosServer{
     udp::endpoint udpEndpoint = *udpResolver.resolve(query);
 
     cv::VideoCapture cam(0);
-    cam.set(CV_CAP_PROP_FORMAT, CV_8UC1);
+    //cam.set(CV_CAP_PROP_FORMAT, CV_8UC1);
     cam.set(CV_CAP_PROP_FRAME_WIDTH, 320);
     cam.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
     //cam.set(CV_CAP_PROP_CONTRAST, 55);
