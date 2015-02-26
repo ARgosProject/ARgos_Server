@@ -140,7 +140,7 @@ namespace argosServer{
 
   bool DocumentDetector::createDetectorDescriptorMatcher(){
     Log::info("Creating feature detector, descriptor extractor and descriptor matcher ...");
-    featureDetector = new cv::SurfFeatureDetector(5000,4);
+    featureDetector = new cv::SurfFeatureDetector(4000,4);
     descriptorExtractor = new cv::SurfDescriptorExtractor();
     descriptorMatcher = cv::Ptr<cv::DescriptorMatcher>(new cv::FlannBasedMatcher(cv::Ptr<cv::flann::IndexParams>(new cv::flann::KDTreeIndexParams())));
 
