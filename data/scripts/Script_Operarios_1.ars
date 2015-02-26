@@ -1,6 +1,6 @@
 # Highlights        R    G    B      X     Y     Z      W    H
-> DrawHighlight  1.00 0.00 0.00   1.00 -2.50  0.00   1.25 0.40
-> DrawHighlight  1.00 0.00 0.00   3.10  3.50  0.00   4.25 0.40
+> DrawHighlight  1.00 0.00 0.00   4.30  3.10  0.00   3.80 0.20
+> DrawHighlight  1.00 0.00 0.00   2.25 -2.50  0.00   1.00 0.40
 
 # Buttons
 > DrawImage VideoButton.jpg -9.25 -2.00 0.00 -1.00 1.00

@@ -10,7 +10,7 @@
     <paper id="1" description="Tampo1" scriptFileName="Script_Tampo_1.ars" descriptorFileName="Template_Tampo_1.jpg" />
     <paper id="2" description="Textil1" scriptFileName="Script_Textil_1.ars" descriptorFileName="Template_Textil_1.jpg" />
     <!--
-        <paper id="0" description="Active1" scriptFileName="Script_Active_1.ars" descriptorFileName="Template_Active_1.jpg" />
+    <paper id="0" description="Active1" scriptFileName="Script_Active_1.ars" descriptorFileName="Template_Active_1.jpg" />
     -->
     <!--
         <paper id="1" description="Neobiz1" scriptFileName="Script_Neobiz_1.ars" descriptorFileName="Template_Neobiz_1.jpg" />
