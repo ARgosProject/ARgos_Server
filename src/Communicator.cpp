@@ -46,7 +46,7 @@ namespace argosServer{
   }
 
   void Communicator::run() {
-    tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
+   tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
     while(1) {
       Log::info("Server listening at " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
@@ -168,7 +168,7 @@ namespace argosServer{
     udp::endpoint udpEndpoint = *udpResolver.resolve(query);
 
     cv::VideoCapture cam(0);
-    //cam.set(CV_CAP_PROP_FORMAT, CV_8UC1);
+    //cam.set(CV_CAP_PROP_FORMAT, CV_8UC3);
     cam.set(CV_CAP_PROP_FRAME_WIDTH, 320);
     cam.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
     //cam.set(CV_CAP_PROP_CONTRAST, 55);
@@ -181,6 +181,7 @@ namespace argosServer{
     }
 
     cv::Mat frame;
+    //cv::Mat frame(cv::Size(640,480),CV_8UC3);
 
     while(_initVideoConference) {
       // Frame receive
