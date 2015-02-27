@@ -1,8 +1,16 @@
+#           | Y
+#           |
+#           |
+#  X -------+------- -X
+#           |
+#           |
+#           | -Y
+
 # Highlights        R    G    B      X     Y    Z      W    H
-> DrawHighlight  0.00 1.00 0.00   5.75  8.70 0.00   1.10 0.20
-> DrawHighlight  0.00 1.00 0.00   1.45  8.70 0.00   1.00 0.20
-> DrawHighlight  1.00 0.00 0.00  -3.85  7.65 0.00   2.15 0.30
-> DrawHighlight  1.00 0.00 0.00  -3.85  7.30 0.00   2.15 0.30
+> DrawHighlight  0.00 1.00 0.00   5.53  8.66 0.00   1.10 0.20
+> DrawHighlight  0.00 1.00 0.00   1.23  8.66 0.00   1.00 0.20
+> DrawHighlight  1.00 0.00 0.00  -4.07  7.61 0.00   2.15 0.30
+> DrawHighlight  1.00 0.00 0.00  -4.07  7.26 0.00   2.15 0.30
 
 # Buttons
 > DrawImage HandButton.jpg  -9.00  4.00 0.00  -1.25 1.25

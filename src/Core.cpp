@@ -125,7 +125,7 @@ namespace argosServer {
         initVideoConference = false;
     }
     else {
-      if (paperList.size() == 0) {
+      if (paperList.empty()) {
         //cout << "Detecting NONE" << endl;
         isPreviousPaperDetected = false;
         previousNumInvoices = 0;
