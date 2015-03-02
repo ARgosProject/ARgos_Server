@@ -152,7 +152,10 @@ namespace argosServer {
 
     for (unsigned int i=0; i < paperList.size(); i++) {
       Log::info(std::to_string(invoicesIndex[i]));
-      paperList[i].setId(invoicesIndex[i]);
+      if (invoicesIndex[i] == 999)
+        paperList[i].setId(999/*invoicesIndex[i]*/);
+      if ((invoicesIndex[i] == 0) || (invoicesIndex[i] == 2))
+        paperList[i].setId(1/*invoicesIndex[i]*/);
       paperList[i].setFingerPoint(fingerPoint3D);
     }
     //paperList.clear();

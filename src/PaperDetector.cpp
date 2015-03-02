@@ -70,15 +70,15 @@ namespace argosServer{
     //cv::threshold(greyFrame, outThres, 127, 255, 0);
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     //cv::threshold (greyFrame, outThres, 165, 255, CV_THRESH_BINARY);
-    thresHold(2, greyFrame, outThres, 50, 255);
-    //thresHold(2, greyFrame, outThres, thresParam1, thresParam2);
+    //thresHold(2, greyFrame, outThres, 50, 255);
+    thresHold(2, greyFrame, outThres, thresParam1, thresParam2);
     //thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
     Mat element = getStructuringElement( MORPH_RECT,
                                          Size(2,2));
     cv::dilate(outThres, outThres, element);
     outThres.copyTo(thres2);
     outThres.copyTo(thres0);
-    // imshow("Threshold", outThres);
+    //imshow("Threshold", outThres);
     //waitKey(1);
 
     //find all rectangles in the thresholdes image
