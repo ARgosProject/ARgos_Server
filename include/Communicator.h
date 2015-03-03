@@ -121,6 +121,7 @@ namespace argosServer{
     //cv::Mat projectorFrame;	// projector openCV frame
     //vector<Paper> paperList;
     bool _initVideoConference;
+    int _oldId;
     //vector<int> invoicesIndex;
   };
 }
