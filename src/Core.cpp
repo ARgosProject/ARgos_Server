@@ -156,9 +156,6 @@ namespace argosServer {
       paperList[i].setFingerPoint(fingerPoint3D);
     }
     //paperList.clear();
-    for (unsigned int i=0; i < paperList.size(); i++) {
-      cout << "Previous id: " << paperList[i].getId() << endl;
-    }
 
     return paperList;
 

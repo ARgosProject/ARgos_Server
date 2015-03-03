@@ -37,6 +37,9 @@ namespace argosServer{
 
     descriptorExtractor->compute( queryImages, queryKeypoints, queryDescriptors );
     Log::success("Computing descriptors for keypoints... [OK]");
+    for(size_t i=0; i< queryDescriptors.size(); i++){
+      cout <<  queryDescriptors.at(i).rows << " descriptors extracted from query image " << i << endl;
+    }
     /*
       FileStorage fs("Descriptors.yml", FileStorage::WRITE);
       for(size_t i=0; i< queryDescriptors.size(); i++){
@@ -85,14 +88,19 @@ namespace argosServer{
         warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
       //warp(trainFrame,paperContent,Size(180,278), detectedPapers[i]);
 
-      //imshow("paperContent", paperContent);
-      //waitKey(1);
+      cv::Mat extract;
+      getRectSubPix(paperContent, Size(120,420), Point2f(540,210), extract);
+
+
+      imshow("paperContent", paperContent);
+      imshow("extract", extract);
+      waitKey(1);
 
 
 
       // extract feautures and compute descriptors of current frame
-      featureDetector->detect(paperContent, trainKeypoints );
-      descriptorExtractor->compute(paperContent, trainKeypoints, trainDescriptors);
+      featureDetector->detect(extract, trainKeypoints );
+      descriptorExtractor->compute(extract, trainKeypoints, trainDescriptors);
       vector<vector<DMatch> > elements_matches;
 
       if (trainDescriptors.empty() || trainDescriptors.rows == 1){
@@ -103,9 +111,9 @@ namespace argosServer{
       }
       else{
         if (trainDescriptors.type() != 0 ){
+          cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
           for(size_t j=0; j < queryDescriptors.size(); j++){
             vector<DMatch> good_matches;
-            //cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
             descriptorMatcher->knnMatch(queryDescriptors[j], trainDescriptors, matches, 2);
             for(unsigned int k=0; k<matches.size(); k++){
               // Apply NNDR
