@@ -16,7 +16,7 @@
 namespace argosServer{
 
   Communicator::Communicator(unsigned short port, const char* iface)
-    : _port(port), _iface(iface), _threadDone(true), _receive(false), _initVideoConference(false) {
+    : _port(port), _iface(iface), _threadDone(true), _receive(false), _initVideoConference(false), _oldId(-2) {
     _tcpSocket = new tcp::socket(_ioService);
 
     Core::getInstance();
@@ -35,7 +35,7 @@ namespace argosServer{
     //projectorFrame = cv::Scalar::all(0);   // Clear last output frame
     //projectorFrame = Core::getInstance().processCvMat(currentFrame);
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
-    //addCvMat(projectorFrame);
+    //addMat(projectorFrame);
 
     vector<Paper>& paperList = Core::getInstance().update(currentFrame, _initVideoConference);
 
@@ -43,8 +43,10 @@ namespace argosServer{
       cout << "Comm id: " << paperList[i].getId() << endl;
     }
 
-    if(paperList.empty())
+    if(paperList.empty()) {
       addSkip();
+      _oldId = -2;
+    }
     else
       addPaper(paperList.back());
   }
@@ -398,13 +400,12 @@ namespace argosServer{
   }
 
   size_t Communicator::addScript(Script& script, int id) {
-    static int oldId = -2;
     int size = 0;
 
     std::vector<ScriptSentence>& sentences = script.getSentences();
     int num_sentences = sentences.size();
 
-    if(id != oldId) {
+    if(id != _oldId) {
       size += addInt(num_sentences);
     }
     else {
@@ -416,7 +417,7 @@ namespace argosServer{
       size += std::stoi(sentence.getScriptFunction()->getProperty("bytes"));
     }
 
-    oldId = id;
+    _oldId = id;
 
     return size;
   }
