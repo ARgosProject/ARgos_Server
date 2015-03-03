@@ -12,6 +12,7 @@ using namespace cv;
 namespace argosServer{
 
   DocumentDetector::DocumentDetector(){
+
     // Create Feature Detectors and Descriptors
     createDetectorDescriptorMatcher();
 
@@ -108,7 +109,7 @@ namespace argosServer{
             descriptorMatcher->knnMatch(queryDescriptors[j], trainDescriptors, matches, 2);
             for(unsigned int k=0; k<matches.size(); k++){
               // Apply NNDR
-              if(matches.at(k).at(0).distance <= 0.8 * matches.at(k).at(1).distance)
+              if(matches.at(k).at(0).distance <= 0.9 * matches.at(k).at(1).distance)
                 good_matches.push_back(matches[k][0]);
             }
             cout <<  "Good Matches: " << good_matches.size() << endl;
@@ -140,7 +141,7 @@ namespace argosServer{
 
   bool DocumentDetector::createDetectorDescriptorMatcher(){
     Log::info("Creating feature detector, descriptor extractor and descriptor matcher ...");
-    featureDetector = new cv::SurfFeatureDetector(4000,4);
+    featureDetector = new cv::SurfFeatureDetector(3000,4);
     descriptorExtractor = new cv::SurfDescriptorExtractor();
     descriptorMatcher = cv::Ptr<cv::DescriptorMatcher>(new cv::FlannBasedMatcher(cv::Ptr<cv::flann::IndexParams>(new cv::flann::KDTreeIndexParams())));
 

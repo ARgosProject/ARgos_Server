@@ -119,7 +119,7 @@ namespace argosServer{
   private:
     cv::Mat currentFrame;		// current frame
     //cv::Mat projectorFrame;	// projector openCV frame
-    vector<Paper> paperList;
+    //vector<Paper> paperList;
     bool _initVideoConference;
     //vector<int> invoicesIndex;
   };

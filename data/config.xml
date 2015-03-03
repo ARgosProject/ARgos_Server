@@ -6,9 +6,9 @@
 
   <argos_papers>
 
-    <paper id="1" description="Operarios1" scriptFileName="Script_Operarios_1.ars" descriptorFileName="Template_Operarios_1.jpg" />
-    <paper id="2" description="Tampo1" scriptFileName="Script_Tampo_1.ars" descriptorFileName="Template_Tampo_1.jpg" />
-    <paper id="3" description="Textil1" scriptFileName="Script_Textil_1.ars" descriptorFileName="Template_Textil_1.jpg" />
+    <paper id="0" description="Operarios1" scriptFileName="Script_Operarios_1.ars" descriptorFileName="asla.jpg" />
+    <paper id="1" description="Tampo1" scriptFileName="Script_Tampo_1.ars" descriptorFileName="estampacion.jpg" />
+    <paper id="2" description="Textil1" scriptFileName="Script_Textil_1.ars" descriptorFileName="asprona.jpg" />
     <!--
     <paper id="0" description="Active1" scriptFileName="Script_Active_1.ars" descriptorFileName="Template_Active_1.jpg" />
     -->

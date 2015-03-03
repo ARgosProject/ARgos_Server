@@ -37,7 +37,11 @@ namespace argosServer{
     //cvtColor(projectorFrame,projectorFrame,CV_BGR2RGB);
     //addCvMat(projectorFrame);
 
-    paperList = Core::getInstance().update(currentFrame, _initVideoConference);
+    vector<Paper>& paperList = Core::getInstance().update(currentFrame, _initVideoConference);
+
+    for (unsigned int i=0; i < paperList.size(); i++) {
+      cout << "Comm id: " << paperList[i].getId() << endl;
+    }
 
     if(paperList.empty())
       addSkip();
@@ -347,7 +351,7 @@ namespace argosServer{
 
     // Id
     int id = paper.getId();
-
+    cout << "id: " << id << endl;
     // Matrix
     float modelview_matrix[16];
     paper.glGetModelViewMatrix(modelview_matrix);
