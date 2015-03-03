@@ -78,8 +78,8 @@ namespace argosServer {
 
     cv::Point fingerPoint(0,0);
     cv::Point2f fingerPoint3D;
-    cv::Point3f point3f;
-    vector<cv::Point2f> out;
+    //cv::Point3f point3f;
+    //vector<cv::Point2f> out;
 
     HandDetector::getInstance().detectFinger(currentFrame,fingerPoint);
     cout << "fingerPoint:" << fingerPoint << endl;
@@ -132,7 +132,7 @@ namespace argosServer {
         numFrames = 0;
       }
       else {
-        if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
+        //if (!isPreviousPaperDetected || (numInvoices != previousNumInvoices)) {// || (numFrames > 30)) {
           isPreviousPaperDetected = true;
           numFrames = 0;
           previousNumInvoices = numInvoices;
@@ -146,16 +146,13 @@ namespace argosServer {
             invoicesIndex.push_back(paperList[i].getId());
             //cout <<  "invoicesIndex " << i << ":"<< invoicesIndex[i]<< endl;
           }
-        }
+          //}
       }
     }
 
     for (unsigned int i=0; i < paperList.size(); i++) {
       Log::info(std::to_string(invoicesIndex[i]));
-      if (invoicesIndex[i] == 999)
-        paperList[i].setId(999/*invoicesIndex[i]*/);
-      if ((invoicesIndex[i] == 0) || (invoicesIndex[i] == 2))
-        paperList[i].setId(1/*invoicesIndex[i]*/);
+      paperList[i].setId(invoicesIndex[i]);
       paperList[i].setFingerPoint(fingerPoint3D);
     }
     //paperList.clear();
@@ -171,9 +168,9 @@ namespace argosServer {
 
     getRectSubPix(paperExtraction, Size(101,50), Point2f(416.16,313.13), signature);
 
-    imshow("extraction", paperExtraction);
-    imshow("signature", signature);
-    cv::waitKey(1);
+    //imshow("extraction", paperExtraction);
+    //imshow("signature", signature);
+    //cv::waitKey(1);
 
   }
 

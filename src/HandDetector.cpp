@@ -13,9 +13,9 @@ namespace argosServer {
 
   HandDetector::HandDetector() {
 
-    configWindow = "Configuration";
+    //configWindow = "Configuration";
 
-    cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);       // configuration window
+    //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);       // configuration window
 
     for(int i=0; i<SAMPLES; i++) {
       c_lower[i][0]=7;
@@ -286,7 +286,7 @@ namespace argosServer {
       else
         fingerPosition =  fingerTips.back();
     }
-    imshow("dt" , detection);
+    //imshow("dt" , detection);
     //imshow("original" , output);
     //imshow("out" , out);
     //imshow("H" , Hx);
@@ -294,7 +294,7 @@ namespace argosServer {
     //imshow("Seq" , Sx);
     //imshow("L" , L);
     //imshow("mask" , mask);
-    waitKey(1);
+    //waitKey(1);
 
   }
 

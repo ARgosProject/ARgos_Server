@@ -111,7 +111,7 @@ namespace argosServer{
               if(matches.at(k).at(0).distance <= 0.8 * matches.at(k).at(1).distance)
                 good_matches.push_back(matches[k][0]);
             }
-            //cout <<  "Good Matches: " << good_matches.size() << endl;
+            cout <<  "Good Matches: " << good_matches.size() << endl;
             elements_matches.push_back(good_matches);
           }
         }
