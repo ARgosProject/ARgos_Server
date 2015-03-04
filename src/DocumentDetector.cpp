@@ -80,27 +80,33 @@ namespace argosServer{
       //cout << "distance_01-23: "<<  (distance_0_1 + distance_2_3) << endl;
       //cout << "distance_12-30: "<<  (distance_1_2 + distance_3_0) << endl;
 
-
-      if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0) )
-        warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
-      //warp(trainFrame,paperContent,Size(278,180), detectedPapers[i]);
-      else
-        warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
-      //warp(trainFrame,paperContent,Size(180,278), detectedPapers[i]);
-
       cv::Mat extract;
-      getRectSubPix(paperContent, Size(120,420), Point2f(540,210), extract);
+      cv::Mat extract2;
+      if( (distance_0_1 + distance_2_3) > (distance_1_2 + distance_3_0)) {
+        warp(trainFrame,paperContent,Size(600,420), detectedPapers[i]);
+        //warp(trainFrame,paperContent,Size(278,180), detectedPapers[i]);
+        getRectSubPix(paperContent, Size(120,420), Point2f(540,210), extract);
+        cv::transpose(extract,extract2);
+        cv::flip(extract2,extract2, 0);
+      }
+      else {
+        warp(trainFrame,paperContent,Size(420,600), detectedPapers[i]);
+        //warp(trainFrame,paperContent,Size(180,278), detectedPapers[i]);
+        getRectSubPix(paperContent, Size(420,120), Point2f(210,540), extract);
+        flip(extract, extract2, -1);
+      }
 
 
-      imshow("paperContent", paperContent);
-      imshow("extract", extract);
-      waitKey(1);
+
+      //imshow("paperContent", paperContent);
+      //imshow("extract", extract2);
+      //waitKey(1);
 
 
 
       // extract feautures and compute descriptors of current frame
-      featureDetector->detect(extract, trainKeypoints );
-      descriptorExtractor->compute(extract, trainKeypoints, trainDescriptors);
+      featureDetector->detect(extract2, trainKeypoints );
+      descriptorExtractor->compute(extract2, trainKeypoints, trainDescriptors);
       vector<vector<DMatch> > elements_matches;
 
       if (trainDescriptors.empty() || trainDescriptors.rows == 1){
@@ -117,7 +123,7 @@ namespace argosServer{
             descriptorMatcher->knnMatch(queryDescriptors[j], trainDescriptors, matches, 2);
             for(unsigned int k=0; k<matches.size(); k++){
               // Apply NNDR
-              if(matches.at(k).at(0).distance <= 0.9 * matches.at(k).at(1).distance)
+              if(matches.at(k).at(0).distance <= 0.4 * matches.at(k).at(1).distance)
                 good_matches.push_back(matches[k][0]);
             }
             cout <<  "Good Matches: " << good_matches.size() << endl;
