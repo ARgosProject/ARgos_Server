@@ -43,8 +43,15 @@ namespace argosServer{
       addSkip();
       _oldId = -2;
     }
-    else
-      addPaper(paperList.back());
+    else {
+      if(paperList.front().getId() != -1) {
+        addPaper(paperList.back());
+      }
+      else {
+        addSkip();
+        _oldId = -2;
+      }
+    }
   }
 
   void Communicator::run() {
