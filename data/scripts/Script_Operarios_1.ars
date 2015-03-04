@@ -15,7 +15,7 @@
 > DrawImage VideoButton.jpg -9.25  3.75 0.00 -1.00 1.00
 
 # Images
-> DrawImage HJM7.jpg -6.00 10.65 0.00 -2.36 1.03
+> DrawImage HJM7.jpg -6.00 5.65 0.00 -2.36 1.03
 
 # Sounds
 > PlaySound HJM7.wav 0

@@ -39,10 +39,6 @@ namespace argosServer{
 
     vector<Paper>& paperList = Core::getInstance().update(currentFrame, _initVideoConference);
 
-    for (unsigned int i=0; i < paperList.size(); i++) {
-      cout << "Comm id: " << paperList[i].getId() << endl;
-    }
-
     if(paperList.empty()) {
       addSkip();
       _oldId = -2;
@@ -52,7 +48,7 @@ namespace argosServer{
   }
 
   void Communicator::run() {
-   tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
+    tcp::acceptor a(_ioService, tcp::endpoint(tcp::v4(), _port));
 
     while(1) {
       Log::info("Server listening at " + getIpFromInterface(_iface) + ":" + std::to_string(_port));
@@ -353,7 +349,7 @@ namespace argosServer{
 
     // Id
     int id = paper.getId();
-    cout << "id: " << id << endl;
+
     // Matrix
     float modelview_matrix[16];
     paper.glGetModelViewMatrix(modelview_matrix);
