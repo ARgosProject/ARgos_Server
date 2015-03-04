@@ -15,11 +15,11 @@
 > DrawHighlight  0.00 1.00 0.00  6.98 -10.91 0.00   1.25 0.25
 
 # Buttons
-> DrawHighlight  0.25 0.25 0.25  -9.00  3.50 0.00  3.00 3.00
+> DrawHighlight  0.25 0.25 0.25  -9.00  3.50 0.00  2.50 2.50
 > DrawImage HelpButton.jpg -9.00  3.50 0.00 -1.25 1.25
-> DrawHighlight  0.25 0.25 0.25  -9.00 -2.65 0.00  3.00 3.00
+> DrawHighlight  0.25 0.25 0.25  -9.00 -2.65 0.00  2.50 2.50
 > DrawImage HelpButton.jpg -9.00 -2.65 0.00 -1.25 1.25
-> DrawHighlight  0.25 0.25 0.25  -9.00 -8.85 0.00  3.00 3.00
+> DrawHighlight  0.25 0.25 0.25  -9.00 -8.85 0.00  2.50 2.50
 > DrawImage HelpButton.jpg -9.00 -8.85 0.00 -1.25 1.25
 
 # Sounds

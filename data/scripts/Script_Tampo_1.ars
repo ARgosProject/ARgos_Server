@@ -17,8 +17,8 @@
 > DrawImage HandButton.jpg  -9.00 -2.50 0.00  -1.25 1.25
 
 # Video placeholders
-> DrawHighlight  0.50 0.50 0.50  -1.25  2.65 0.00  3.50 2.00
-> DrawHighlight  0.50 0.50 0.50  -1.25 -3.95 0.00  3.50 2.00
+> DrawHighlight  0.50 0.50 0.50  -1.25  2.15 0.00  3.50 2.00
+> DrawHighlight  0.50 0.50 0.50  -1.25 -7.35 0.00  3.50 2.00
 
 # Sounds
 > PlaySound tampo.wav 0
