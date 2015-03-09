@@ -21,4 +21,4 @@
 #> DrawHighlight  0.50 0.50 0.50  -1.25 -4.55 0.00  3.50 2.00
 
 # Sounds
-> PlaySound tampo.wav 0
+# > PlaySound tampo.wav 0

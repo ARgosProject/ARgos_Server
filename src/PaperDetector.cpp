@@ -4,6 +4,8 @@
 #include <iostream>
 #include "PaperDetector.h"
 #include "Log.h"
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 using namespace cv;
@@ -12,15 +14,21 @@ namespace argosServer{
 
   PaperDetector::PaperDetector() {
     thresMethod = CANNY;
-    // With balck panel
+    // With black panel
     //thresParam1 = 100;
     //thresParam2 = 60;
-    thresParam1 = 50;
-    thresParam2 = 255;
+
+    //Canny
+    thresParam1 = 47;
+    thresParam2 = 110;
+
+    //thresParam1 = 7;
+    //thresParam2 = 7;
+
 
     minContourValue = 0.1;
     maxContourValue = 0.8;
-    minContourAreaValue = 41000;
+    minContourAreaValue = 47000;
     maxContourAreaValue = 49000;
 
     //historicWeights = {0.020,0.030,0.040,0.060,0.070,0.080,0.090,0.110,0.240,0.260};
@@ -35,13 +43,13 @@ namespace argosServer{
     //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);  // configuration window
 
     // Trackbar Threshold
-    trackbarType = "Type:\n 0:Fixed\n1:Adapt\n2:Canny";
-    trackbarParm1 = "Parameter 1";
-    trackbarParm2 = "Parameter 2";
+    //trackbarType = "Type:\n 0:Fixed\n1:Adapt\n2:Canny";
+    //trackbarParm1 = "Parameter 1";
+    //trackbarParm2 = "Parameter 2";
 
-    cv::createTrackbar(trackbarType, configWindow, &typeThres, max_Type, NULL);
-    cv::createTrackbar(trackbarParm1, configWindow, &thresParam1, max_Level, NULL);
-    cv::createTrackbar(trackbarParm2, configWindow, &thresParam2, max_Level, NULL);
+    //cv::createTrackbar(trackbarType, configWindow, &typeThres, max_Type, NULL);
+    //cv::createTrackbar(trackbarParm1, configWindow, &thresParam1, max_Level, NULL);
+    //cv::createTrackbar(trackbarParm2, configWindow, &thresParam2, max_Level, NULL);
   }
 
   PaperDetector::~PaperDetector() {}
@@ -52,10 +60,13 @@ namespace argosServer{
    *
    *
    ************************************/
-  void PaperDetector::detect(const cv::Mat& currentFrame,vector<Paper>& detectedPapers, CameraProjectorSystem& cameraProjector,cv::Size paperSizeMeters, bool screenExtrinsics, bool setYPerperdicular) throw (cv::Exception) {
+  void PaperDetector::detect(const cv::Mat& currentFrame,vector<Paper>& detectedPapers,
+                             CameraProjectorSystem& cameraProjector,cv::Size paperSizeMeters,
+                             bool screenExtrinsics, bool setYPerperdicular) throw (cv::Exception) {
     //clear input data
     detectedPapers.clear();
-    currentFrame.copyTo(debug);
+
+    //currentFrame.copyTo(debug);
     //cv::cvtColor(debug, debug, CV_GRAY2BGR);
 
     //- Convert to greyScale  -------------------------------
@@ -64,20 +75,24 @@ namespace argosServer{
     else
       greyFrame = currentFrame;
 
-    cv::Mat thres0;
-    greyFrame.copyTo(thres0);
+
+    //- Copy grey image for Hough space
+    cv::Mat houghImage;
+    greyFrame.copyTo(houghImage);
+
+
     //- Thresholding image ----------------------------------------------------------------
     //cv::threshold(greyFrame, outThres, 127, 255, 0);
     //cv::threshold(greyFrame, outThres, 200.0, 255.0, THRESH_BINARY);
     //cv::threshold (greyFrame, outThres, 165, 255, CV_THRESH_BINARY);
-    //thresHold(2, greyFrame, outThres, 50, 255);
-    thresHold(2, greyFrame, outThres, thresParam1, thresParam2);
-    //thresHold(thresMethod, greyFrame, outThres, thresParam1, thresParam2);
-    Mat element = getStructuringElement( MORPH_RECT,
-                                         Size(2,2));
-    cv::dilate(outThres, outThres, element);
+    thresHold(2, greyFrame, outThres, 50, 255);
+    //thresHold(2, greyFrame, outThres, thresParam1, thresParam2);
+    //thresHold(typeThres, greyFrame, outThres, thresParam1, thresParam2);
+    //Mat element = getStructuringElement( MORPH_RECT,
+    //                                Size(2,2));
+    //cv::dilate(outThres, outThres, element);
     outThres.copyTo(thres2);
-    outThres.copyTo(thres0);
+    //outThres.copyTo(thres0);
     //imshow("Threshold", outThres);
     //waitKey(1);
 
@@ -102,11 +117,12 @@ namespace argosServer{
     //for (size_t i = 0; i < contours.size(); i++)
     //  drawContour(debug,contours[i], CV_RGB(255,0,255));
     //imshow("debug", debug);
+    //cv::waitKey(1);
 
     if (PaperCandidates.size() == 0) {
       Log::info("HoughSpace");
       // Hough Line Transform
-      houghLineTransform(thres0, PaperCandidates);
+      houghLineTransform(houghImage, PaperCandidates);
     }
 
     //cv::waitKey(1);
@@ -293,7 +309,7 @@ namespace argosServer{
             if (minDist > 10) {
               //add the points
               //cout<<"ADDED"<<endl;
-              drawApproxCurve(debug,approxCurve,CV_RGB(243,249,21));  // yellow
+              //drawApproxCurve(debug,approxCurve,CV_RGB(243,249,21));  // yellow
 
               PaperCandidates.push_back ( PaperCandidate() );
               PaperCandidates.back().idx = i;
@@ -308,8 +324,8 @@ namespace argosServer{
               maxCosine = std::max(maxCosine, cosine);
             }
 
-            if(maxCosine < 0.3)
-              drawApproxCurve(debug,approxCurve,CV_RGB(255,0,0));   //red
+            //if(maxCosine < 0.3)
+              //drawApproxCurve(debug,approxCurve,CV_RGB(255,0,0));   //red
           }
         }
       }
@@ -363,12 +379,12 @@ namespace argosServer{
 
   void  PaperDetector:: drawApproxCurve ( Mat &in,vector<Point>  &contour,Scalar color ) {
     for ( unsigned int i=0;i<contour.size();i++ ){
-      cv::line ( in,contour[i],contour[ ( i+1 ) %contour.size() ],color );
+      cv::line ( in,contour[i],contour[ ( i+1 ) %contour.size() ],color,2 );
     }
   }
   void  PaperDetector:: drawApproxCurve ( Mat &in,vector<Point2f>  &contour,Scalar color ) {
     for ( unsigned int i=0;i<contour.size();i++ ){
-      cv::line ( in,contour[i],contour[ ( i+1 ) %contour.size() ],color );
+      cv::line ( in,contour[i],contour[ ( i+1 ) %contour.size() ],color,2 );
     }
   }
 
@@ -455,7 +471,8 @@ namespace argosServer{
     Point d2 = p2 - o2;
 
     float cross = d1.x*d2.y - d1.y*d2.x;
-    if (abs(cross) < 100)
+    //cout << "cross: " << abs(cross) << endl;
+    if (abs(cross) < 800)
       //cout << "cross: " << cross<< endl;
       //if (abs(cross) < /*EPS*/1e-8)
       return cv::Point(-1, -1);
@@ -490,11 +507,10 @@ namespace argosServer{
 
 
   void PaperDetector::houghLineTransform(cv::Mat& image, vector<PaperCandidate> &PaperCandidates) {
-    cv::Mat  image_c;
-    //cv::Mat  image_d;
-    //cv::Mat dst = image.clone();
 
-    //cvtColor(dst, dst, CV_GRAY2BGR);
+    //image.copyTo(image_c);
+    //cv::Mat  image_d;
+
     //cv::Mat dst2(600,800,CV_8UC3);
     //dst2 = Scalar::all(0);
 
@@ -504,163 +520,189 @@ namespace argosServer{
     projectionLimits.push_back(cv::Point(565,338));
     projectionLimits.push_back(cv::Point(250,338));
 
-    //drawApproxCurve (dst, projectionLimits, CV_RGB(0,0,255));
-
     //drawApproxCurve (dst2, projectionLimits, CV_RGB(0,0,255));
 
     //cv::Mat  image_d;
 
+    //- Thresholding image ----------------------------------------------------------------
+    cv::Mat  imageThres;
     //cv::Point center(0,0);
     //cv::adaptiveThreshold(image, image_c, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY_INV, 7, 7);
     //cv::threshold (image, image_c, thresParam1, 255, CV_THRESH_BINARY);
-    //thresHold(typeThres,image, image_c, thresParam1, thresParam2);
+    thresHold(typeThres,image, imageThres, thresParam1, thresParam2);
     //cv::blur( image, image_d, Size(3,3),Point(-1,-1));
-    cv::Canny(image, image_c, 25, 180);
-    cv::Mat element = getStructuringElement( MORPH_RECT, Size(2.5,2.5), Point(0,0));
-    cv::dilate(image_c, image_c, element);
-    //cv::imshow("thres", image_c);
+    //cv::Canny(image, image_c, 25, 180);
+    //cv::Mat element = getStructuringElement( MORPH_RECT, Size(2,2));
+    //cv::dilate(imageThres, imageThres, element);
+    //cv::imshow("thres", imageThres);
 
-    std::vector<cv::Vec4i> lines;
-    //cv::HoughLinesP(image_c, lines, 1, CV_PI/180, 70, 3, 10);
-    cv::HoughLinesP(image_c, lines, 1, CV_PI/180,40,40, 8);
+    cv::Mat dst = imageThres.clone();
+    cvtColor(dst, dst, CV_GRAY2BGR);
+    //drawApproxCurve (dst, projectionLimits, CV_RGB(0,0,255));
 
-    std::vector<cv::Vec4i> lines2;
-    for (size_t i = 0; i < lines.size(); i++) {
-      cv::Vec4i v = lines[i];
+    std::vector<cv::Vec4i> allLines;
+    //cv::HoughLinesP(imageThres, allLines, 1, CV_PI/180, 70, 3, 10);
+    cv::HoughLinesP(imageThres, allLines, 1, CV_PI/180, 25 , 10 , 10 );
+
+    int maxX = 800;
+    int maxY = 600;
+    int minX = 0;
+    int minY = 0;
+
+    std::queue<cv::Vec4i> min_X;
+    std::queue<cv::Vec4i> max_X;
+    std::queue<cv::Vec4i> min_Y;
+    std::queue<cv::Vec4i> max_Y;
+
+
+    std::vector<cv::Vec4i> selectedLines;
+
+    for (vector<cv::Vec4i>::iterator c = allLines.begin(); c < allLines.end(); c++) {
+      cv::Vec4i v = (*c);
+
       if ((pointPolygonTest(projectionLimits,cv::Point(v[0], v[1]),false) >= 0) &&      // line is into projection limits
           (pointPolygonTest(projectionLimits,cv::Point(v[2], v[3]),false) >= 0) &&
-          (length(v) > 45)) {                                                          // line is longer than a threshold value
-        //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(0,0,255),3);
-        lines2.push_back(v);
-      }
-    }
+          (length(v) > 5)) {                                                            // line is longer than a threshold value
 
-    std::vector<cv::Vec4i> lines3;
-    for (size_t i = 0; i < lines2.size(); i++) {
-      for (size_t j = i+1; j < lines2.size(); j++) {
-        cv::Point pt = computeIntersect(lines2[i], lines2[j]);
-        if (pt.x < 0 && pt.y < 0) {
-          //cv::line(dst, cv::Point(lines2[i][0], lines2[i][1]), cv::Point(lines2[i][2], lines2[i][3]), CV_RGB(255,0,0),3);
-          //cv::line(dst, cv::Point(lines2[j][0], lines2[j][1]), cv::Point(lines2[j][2], lines2[j][3]), CV_RGB(0,255,0),3);
-          lines3.push_back(lines2[i]);
+        //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(255,255,0),2);
+
+        cv::Point midPoint( (v[0] + v[2]) / 2, (v[1] + v[3]) / 2);
+
+        if (midPoint.x < maxX) {
+          maxX = midPoint.x;
+          if (min_X.size() == 4) min_X.pop();
+          min_X.push(v);
+        }
+
+        if (midPoint.x > minX) {
+          minX = midPoint.x;
+          if (max_X.size() == 4) max_X.pop();
+          max_X.push(v);
+        }
+
+        if (midPoint.y < maxY) {
+          maxY = midPoint.y;
+          if (min_Y.size() == 4) min_Y.pop();
+          min_Y.push(v);
+        }
+
+        if (midPoint.y > minY) {
+          minY = midPoint.y;
+          if (max_Y.size() == 4) max_Y.pop();
+          max_Y.push(v);
         }
       }
     }
 
+    std::vector<cv::Vec4i> externalLines;
 
-    std::vector<cv::Vec4i> lines4;
-    for (size_t i = 0; i < lines3.size(); i++) {
-      for (size_t j = i+1; j < lines3.size(); j++) {
-        float angle = angleBetween2Lines(lines3[i], lines3[j]);
-        //cout << "angle: " << angle << endl;
-        if (4.6 < angle && angle < 4.8) {
-          //cv::line(dst, cv::Point(lines3[i][0], lines3[i][1]), cv::Point(lines3[i][2], lines3[i][3]), CV_RGB(255,0,0),3);
-          //cv::line(dst, cv::Point(lines2[j][0], lines2[j][1]), cv::Point(lines2[j][2], lines2[j][3]), CV_RGB(0,255,0),3);
-          //cv::Vec4i v = lines3[i];
-          //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(255,0,0),3);
-          lines4.push_back(lines3[i]);
-        }
-      }
+    while (!min_X.empty()) {
+      externalLines.push_back(min_X.front());
+      min_X.pop();
+    }
+
+    while (!max_X.empty()) {
+      externalLines.push_back(max_X.front());
+      max_X.pop();
+    }
+
+    while (!min_Y.empty()) {
+      externalLines.push_back(min_Y.front());
+      min_Y.pop();
+    }
+
+    while (!max_Y.empty()) {
+      externalLines.push_back(max_Y.front());
+      max_Y.pop();
     }
 
 
-    vector<cv::Point> corners;
-    for (size_t i = 0; i < lines4.size(); i++) {
-      cv::Vec4i v = lines4[i];
-      if(length(v) > 45) {
-        //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(0,255,0),3);
-        corners.push_back(cv::Point(v[0], v[1]));
-        corners.push_back(cv::Point(v[2], v[3]));
-      }
-    }
-
-    //for (size_t i = 0; i < corners.size(); i++) {
-    // circle(dst2, corners[i], 3, CV_RGB(255,0,0), -1);
-    //}
-    /*
-    cv::Mat dst3(600,800,CV_8UC1);
-    cv::Mat dst4(600,800,CV_8UC3);
-    dst4 = Scalar::all(0);
-
-
-    dst2.copyTo(dst3);
-    //- Find Contours--------------------------------------------------------------------
-    vector<vector<cv::Point> > contours;
-    vector<cv::Vec4i> hierarchy;
-    //cv::findContours(thres2, contours, hierarchy, CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
-    //cv::findContours(thres2, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_NONE);
-    cv::findContours(dst3, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_NONE);
-    //cv::findContours(thres2, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_SIMPLE);
-    //cv::findContours(thres2, contours, hierarchy, CV_RETR_EXTERNAL , CV_CHAIN_APPROX_TC89_L1);
-
-
-    for (size_t i = 0; i < contours.size(); i++)
-      drawContour(dst4,contours[i], CV_RGB(255,0,0));
-
-    //vector<cv::Point>  approxCurve;
-    //for(unsigned int i=0; i<contours.size(); i++) {
-      //if(minSize < (int)contours[i].size() && (int)contours[i].size() < maxSize) {
-      //approximate to a poligon
-      //cv::approxPolyDP(contours[i], approxCurve, double(contours[i].size())*0.02, true);
-      //drawApproxCurve(dst, approxCurve, Scalar(255,0,255));
-      //check that the poligon has 4 points
+    // for (size_t i = 0; i < externalLines.size(); i++) {
+    //cv::Vec4i v = externalLines[i];
+    //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(255,0,0),2);
     //}
 
-    std::vector<cv::Point> corners;
-    for (size_t i = 0; i < lines3.size(); i++) {
-      for (size_t j = i+1; j < lines3.size(); j++) {
-        float angle = angleBetween2Lines(lines3[i], lines3[j]);
-        if (1.04 < angle && angle < 1.74) {
-          cv::Point pt = computeIntersect(lines3[i], lines3[j]);
-          if (pt.x >= 0 && pt.y >= 0 && (pointPolygonTest(projectionLimits, pt, false) >= 0)){
-            circle(dst, pt, 3, CV_RGB(255,0,0));
-            corners.push_back(pt);
+    // Angulo entre lineas 80-120
+    std::vector<cv::Vec4i> angleLines;
+    for (size_t i = 0; i < externalLines.size(); i++) {
+      for (size_t j = 0; j < externalLines.size(); j++) {
+        if (i == j) continue;
+        else{
+          float angle = angleBetween2Lines(externalLines[i], externalLines[j]);
+          //cout << "angle: " << angle << endl;
+          if ( (75.0 < angle && angle < 105.0)  || (255.0 < angle && angle < 285.0) ||
+               (350.0 < angle && angle < 360.0) ||  (0.0 <= angle && angle < 5.0)   || (175.0 <= angle && angle < 185.0) ) {
+            // cv::Vec4i v = externalLines[i];
+            //cv::line(dst, cv::Point(v[0], v[1]), cv::Point(v[2], v[3]), CV_RGB(255,0,255),2);
+            angleLines.push_back(externalLines[i]);
+            //cout << "angle OK: " << angle << endl;
+            break;
           }
         }
       }
     }
-    */
 
-    if (corners.size() > 0) {
-      vector<cv::Point> hull;
-      cv::convexHull(corners, hull, true);
-      std::vector<cv::Point> approx;
-      cv::approxPolyDP(hull, approx, double(0.1*arcLength(hull, true)), true);
-      //drawApproxCurve(dst2, approx, CV_RGB(0,255,0));
+    if (angleLines.size() >= 4){
 
-      if(approx.size() == 4 &&
-         (minContourAreaValue < cv::contourArea(approx)) && (cv::contourArea(approx) < maxContourAreaValue)) {
-        //drawApproxCurve(dst2, approx, CV_RGB(0,255,0));
-        //drawApproxCurve(debug, approx , CV_RGB(255,0,0));   //blue
-        //imshow("debug", debug);
-        PaperCandidates.push_back(PaperCandidate());
-        PaperCandidates.back().idx = 0;
-        PaperCandidates.back().push_back(Point2f(approx[2].x,approx[2].y));
-        PaperCandidates.back().push_back(Point2f(approx[1].x,approx[1].y));
-        PaperCandidates.back().push_back(Point2f(approx[0].x,approx[0].y));
-        PaperCandidates.back().push_back(Point2f(approx[3].x,approx[3].y));
+      std::vector<int> fourLines;
+      vector<cv::Point> corners;
 
-      }
+      int n = angleLines.size();
+      int r = 4;
+      std::vector<bool> v(n);
+      //cout << n << " líneas detectadas" << endl;
+
+      std::fill(v.begin() + r, v.end(), true);
+      do {
+        fourLines.clear();
+        for (int i = 0; i < n; ++i) {
+          if (!v[i]) {
+            //std::cout << (i) << " ";
+            fourLines.push_back(i);
+          }
+        }
+        //std::cout << "\n";
+
+        corners.clear();
+        for (size_t i = 0; i < fourLines.size() - 1; i++) {
+          for (size_t j = (i+1); j < fourLines.size(); j++) {
+            if (i == j) continue;
+            else {
+              cv::Point pt = computeIntersect(angleLines[fourLines[i]], angleLines[fourLines[j]]);
+              //cout << "intersection " << i << " , " << j << endl;
+              if ( (pt.x >= 0 && pt.y >= 0) && (pointPolygonTest(projectionLimits, pt ,false) >= 0) ) {      // line is into projection limits
+                //cout << "Point: ("<< pt.x << "," << pt.y <<")"<< endl;
+                corners.push_back(pt);
+              }
+            }
+          }
+        }
+
+        if (corners.size() == 4) {
+          vector<cv::Point> hull;
+          cv::convexHull(corners, hull, true);
+          std::vector<cv::Point> approx;
+          cv::approxPolyDP(hull, approx, double(0.1*arcLength(hull, true)), true);
+          //drawApproxCurve(dst, approx, CV_RGB(0,255,0));
+
+          if((minContourAreaValue < cv::contourArea(approx)) && (cv::contourArea(approx) < maxContourAreaValue)) {
+            //cout << "Contour Area: " << cv::contourArea(approx) << endl;
+
+            //drawApproxCurve(dst, approx, CV_RGB(0,255,0));
+            //for (size_t i = 0; i < corners.size(); i++)
+            // circle(dst, corners[i], 3, CV_RGB(255,255,0), -1);
+
+            PaperCandidates.push_back(PaperCandidate());
+            PaperCandidates.back().idx = 0;
+            PaperCandidates.back().push_back(Point2f(approx[2].x,approx[2].y));
+            PaperCandidates.back().push_back(Point2f(approx[1].x,approx[1].y));
+            PaperCandidates.back().push_back(Point2f(approx[0].x,approx[0].y));
+            PaperCandidates.back().push_back(Point2f(approx[3].x,approx[3].y));
+            break;
+          }
+        }
+      } while (std::next_permutation(v.begin(), v.end()));
     }
-    /*
-    //std::vector<cv::Point2f> approx;
-    //cv::approxPolyDP(cv::Mat(corners), approx, cv::arcLength(cv::Mat(corners), true) * 0.01, true);
-    //drawApproxCurve(dst2, approx, Scalar(255,255,255));
-    //if (approx.size() != 4) {
-    //  std::cout << "The object is not quadrilateral!" << std::endl;
-    //  return;
-    //}
-
-    // Get mass center
-    //for (size_t i = 0; i < corners.size(); i++)
-    //  center += corners[i];
-    //center *= (1. / corners.size());
-
-    //sortCorners(corners, center);
-    //for (size_t i = 0; i < corners.size(); i++)
-    //cv::circle(dst2, corners[i], 3, CV_RGB(0,0,255), 2);
-    */
-
     //cv::imshow("image", dst);
     //cv::imshow("image2", dst2);
     //cv::imshow("image4", dst4);
@@ -692,7 +734,11 @@ namespace argosServer{
                          line1[0] - line1[2]);    // X1 - X2
     float angle2 = atan2(line2[1] - line2[3],     // Y1 - Y2
                          line2[0] - line2[2]);    // X1 - X2
-    return abs(angle1-angle2);
+
+    float angle = (angle1-angle2) * 180.0 / CV_PI;
+
+    if (angle < 0.0 ) return angle + 360;
+    else return angle;
   }
 
 

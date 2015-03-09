@@ -22,4 +22,4 @@
 #> DrawImage HelpButton.jpg -9.00 -8.85 0.00 -1.25 1.25
 
 # Sounds
-> PlaySound textil.wav 0
+# > PlaySound textil.wav 0

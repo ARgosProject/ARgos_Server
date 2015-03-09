@@ -96,13 +96,9 @@ namespace argosServer{
         flip(extract, extract2, -1);
       }
 
-
-
       //imshow("paperContent", paperContent);
       //imshow("extract", extract2);
       //waitKey(1);
-
-
 
       // extract feautures and compute descriptors of current frame
       featureDetector->detect(extract2, trainKeypoints );
@@ -117,7 +113,7 @@ namespace argosServer{
       }
       else{
         if (trainDescriptors.type() != 0 ){
-          cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
+          //cout <<  "trainDescriptors rows =  "<<  trainDescriptors.rows << endl;
           for(size_t j=0; j < queryDescriptors.size(); j++){
             vector<DMatch> good_matches;
             descriptorMatcher->knnMatch(queryDescriptors[j], trainDescriptors, matches, 2);
@@ -126,7 +122,7 @@ namespace argosServer{
               if(matches.at(k).at(0).distance <= 0.4 * matches.at(k).at(1).distance)
                 good_matches.push_back(matches[k][0]);
             }
-            cout <<  "Good Matches: " << good_matches.size() << endl;
+            //cout <<  "Good Matches: " << good_matches.size() << endl;
             elements_matches.push_back(good_matches);
           }
         }
