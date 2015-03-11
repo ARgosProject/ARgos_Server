@@ -13,11 +13,7 @@ namespace argosServer {
 
   HandDetector::HandDetector() {
 
-    //configWindow = "Configuration";
-
-    //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);       // configuration window
-
-    for(int i=0; i<SAMPLES; i++) {
+    /*for(int i=0; i<SAMPLES; i++) {
       c_lower[i][0]=7;
       c_upper[i][0]=12;
       c_lower[i][1]=30;
@@ -25,10 +21,21 @@ namespace argosServer {
       c_lower[i][2]=80;
       c_upper[i][2]=80;
     }
+    //createTrackbar("H Low",configWindow,&c_lower[0][0],255);
+    //createTrackbar("H High",configWindow,&c_upper[0][0],255);
+    //createTrackbar("L Low",configWindow,&c_lower[0][1],255);
+    //createTrackbar("L High",configWindow,&c_upper[0][1],255);
+    //createTrackbar("S Low",configWindow,&c_lower[0][2],255);
+    //createTrackbar("S High",configWindow,&c_upper[0][2],255);
+    */
+
+
+    //configWindow = "Configuration";
+    //cv::namedWindow(configWindow, CV_WINDOW_AUTOSIZE);       // configuration window
 
     Hlow = 0;
-    Htop = 25;
-    Slow = 80;
+    Htop = 12;
+    Slow = 22;
     Stop = 255;
     Vlow = 0;
     Vtop = 255;
@@ -39,14 +46,8 @@ namespace argosServer {
     createTrackbar("S High",configWindow,&Stop,255);
     createTrackbar("V Low",configWindow,&Vlow,255);
     createTrackbar("V High",configWindow,&Vtop,255);
-    /*
-    createTrackbar("H Low",configWindow,&c_lower[0][0],255);
-    createTrackbar("H High",configWindow,&c_upper[0][0],255);
-    createTrackbar("L Low",configWindow,&c_lower[0][1],255);
-    createTrackbar("L High",configWindow,&c_upper[0][1],255);
-    createTrackbar("S Low",configWindow,&c_lower[0][2],255);
-    createTrackbar("S High",configWindow,&c_upper[0][2],255);
 
+    /*
     cv::Size roiSize(5,5);
     roi.push_back(cv::Rect(320,287, roiSize.width, roiSize.height));
     roi.push_back(cv::Rect(367,288, roiSize.width, roiSize.height));
@@ -60,7 +61,7 @@ namespace argosServer {
 
   HandDetector::~HandDetector() {
   }
-
+  /*
   int HandDetector::getMedian(vector<int> values){
     int median;
     size_t size = values.size();
@@ -145,7 +146,7 @@ namespace argosServer {
     cv::medianBlur(composedImage, composedImage, 7);
     cv::imshow("Median", composedImage);
   }
-
+  */
   void HandDetector::detectFinger(const cv::Mat& currentFrame, cv::Point& fingerPosition) {
     vector<cv::Point> handLimits;
     handLimits.push_back(cv::Point(262,0));
@@ -159,7 +160,7 @@ namespace argosServer {
 
     cv::cvtColor(currentFrame, imageHLS, CV_BGR2HSV);
 
-    Mat H, S,Seq, L, Heq, Hx, Sx, outImage;
+    Mat H, S,Seq, L, Heq, Herode, Hx, Sx, outImage, Serode;
     vector<Mat> channels(3);
     // split img:
     split(imageHLS, channels);
@@ -169,11 +170,15 @@ namespace argosServer {
     L = channels[2];
 
     equalizeHist(H, Heq);
-    cv::Mat element = getStructuringElement(MORPH_ELLIPSE, Size(7,7));
-    cv::erode(Heq, Heq, element);
+    //equalizeHist(S, Seq);
 
-    bilateralFilter(Heq, Hx, 7, 10, 7);
-    bilateralFilter(S, Sx, 7, 24, 7);
+    cv::Mat element = getStructuringElement(MORPH_ELLIPSE, Size(5,5));
+
+    cv::erode(Heq, Herode, element);
+    cv::erode(S, Serode, element);
+
+    bilateralFilter(Herode, Hx, 5, 40, 40);
+    bilateralFilter(Serode, Sx, 5, 100, 100);
 
     channels[0] = Hx;
     channels[1] = Sx;
@@ -188,50 +193,25 @@ namespace argosServer {
     lower = cv::Scalar(Hlow,Slow,Vlow);
     upper = cv::Scalar(Htop,Stop,Vtop);
 
+    //cv::Mat Hout, Sout;
+    //cv::inRange(Hx, Hlow, Htop, Hout);
+    //cv::inRange(Sx, Slow, Stop, Sout);
 
     cv::inRange(outImage, lower, upper, thresholdImage);
+    channels[0] = Hx;
+    channels[1] = Sx;
 
-    cv::Mat kernel2 = getStructuringElement(MORPH_ELLIPSE, cv::Size(3,3));
+    //channels[0] = Hout;
+    //channels[1] = Sout;
+    merge(channels, outImage);
+
+    cv::Mat kernel2 = getStructuringElement(MORPH_ELLIPSE, cv::Size(4,4));
 
     morphologyEx(thresholdImage, thresholdImage, MORPH_OPEN, kernel2, cv::Point (-1,-1), 3);
     morphologyEx(thresholdImage, thresholdImage, MORPH_CLOSE, kernel2, cv::Point (-1,-1), 3);
 
-    //for(int i=0; i < SAMPLES; i++) {
-    //cv::rectangle(output, roi[i], CV_RGB(0,255,0));
-    //getAvgColor(imageHLS, roi[i], avgColor[i]);
-      //cout << "avgColor: " <<  avgColor[i][0] << " " << avgColor[i][1] << " " << avgColor[i][2] << endl;
-    //}
-    //cout << endl;
-    //cv::blur(imageHLS,imageHLS,Size(3,3));
 
-    //produceBinaries(imageHLS);
-
-    //blur(currentFrame, hsvFrame, Size(5,5));
-
-    /*
-
-    cv::Mat skin = GetSkin(currentFrame);
-
-    cv::Mat detection, mask;
-
-    currentFrame.copyTo(detection);
-
-    int dilation_size = 4;
-    int erosion_size = 4;
-
-    //erode(skin, skin, cv::Mat());
-    //dilate(skin,skin, cv::Mat());
-
-    erode(skin, skin, getStructuringElement(MORPH_RECT,
-                                            Size(2*erosion_size+1, 2*erosion_size+1),
-                                            Point(erosion_size, erosion_size)));
-
-    dilate(skin, skin, getStructuringElement(MORPH_RECT,
-                                             Size(2*dilation_size+1, 2*dilation_size+1),
-                                             Point(dilation_size, dilation_size)));
-    */
     cv::Mat detection, thres;
-
 
     cv::Mat mask(cv::Size(800,600),CV_8UC1,Scalar::all(0));
     for(int x = 0; x < mask.cols; x++){
@@ -244,9 +224,6 @@ namespace argosServer {
     thresholdImage.copyTo(thres,mask);
     thres.copyTo(detection);
     cvtColor(detection, detection, CV_GRAY2BGR);
-    //imshow("mask" , mask);
-    //imshow("Hx" , thresholdImage);
-
 
     vector<cv::Point> fingerTips;
 
@@ -257,47 +234,36 @@ namespace argosServer {
 
     int indexMaxContour = findBiggestContour(contours);
 
-    if (indexMaxContour != -1 && contours[indexMaxContour].size() > 10 ) {
-      //cv::Point armcenter;
-      // cv::RotatedRect contourcenter;
-      drawContours(detection,contours,indexMaxContour,CV_RGB(255,0,0),3);
-      //contourcenter =  minAreaRect(contours[indexMaxContour]);
-
-      //Point2f vertices[4];
-      //contourcenter.points(vertices);
-      //for (int i = 0; i < 4; i++)
-      //line(detection, vertices[i], vertices[(i+1)%4], CV_RGB(0,0,255),2);
-
-
-      //armcenter.x = contourcenter.center.x;
-      //armcenter.y = contourcenter.center.y;
-      //circle(detection,armcenter,10,CV_RGB(255,255,255),-1,8,0);
+    if (indexMaxContour != -1 && contours[indexMaxContour].size() > 380 ) {
+      //drawContours(detection,contours,indexMaxContour,CV_RGB(255,0,0),3);
 
       getconvexhull(contours[indexMaxContour], detection, fingerTips);
 
-
-      for (vector<Point>::iterator c = fingerTips.begin(); c < fingerTips.end(); c++) {
-        cv::Point v=(*c);
-        circle(detection,v,5,CV_RGB(0,255,0),-1,CV_AA,0);
-      }
+      //for (vector<Point>::iterator c = fingerTips.begin(); c < fingerTips.end(); c++) {
+      //  cv::Point v=(*c);
+      //  circle(detection,v,5,CV_RGB(0,255,0),-1,CV_AA,0);
+      //}
 
       if (fingerTips.empty() )
         fingerPosition = cv::Point(-1,-1);
       else
         fingerPosition =  fingerTips.back();
     }
-    //imshow("dt" , detection);
-    //imshow("original" , output);
-    //imshow("out" , out);
-    //imshow("H" , Hx);
-    //imshow("x",thresholdImage);
-    //imshow("Seq" , Sx);
-    //imshow("L" , L);
+
+    //imshow("detection" , detection);
+    //imshow("thres" , thres);
+    //imshow("Hout" , Hout);
+    //imshow("Sout" , Sout);
+    //imshow("Seq", Seq);
+    //imshow("Serode" , Serode);
+    //imshow("Hx" , Hx);
+    //imshow("Sx" , Sx);
     //imshow("mask" , mask);
+    //imshow("thres" , thres);
     //waitKey(1);
 
   }
-
+  /*
   bool HandDetector::R1(int R, int G, int B) {
     //bool e1 = (R>95) && (G>40) && (B>20) && ((max(R,max(G,B)) - min(R, min(G,B)))>15) && (abs(R-G)>15) && (R>G) && (R>B);
     //bool e2 = (R>220) && (G>210) && (B>170) && (abs(R-G)<=15) && (R>B) && (G>B);
@@ -376,7 +342,7 @@ namespace argosServer {
     }
     return mask;
   }
-
+  */
   void HandDetector::getconvexhull(vector<cv::Point> &contour, cv::Mat& image, vector<cv::Point> &fingerTips) {
 
     vector<cv::Point> palm;
@@ -389,12 +355,12 @@ namespace argosServer {
     //int tolerance =  contourRect.size.height/5;
     //float angleTolerance = 95;
 
-    drawApproxCurve(image, hull, Scalar(255,255,255));
+    //drawApproxCurve(image, hull, Scalar(255,255,255));
     cv::convexHull(contour,hullIndex,false, false);
     cv::convexHull(contour,hull,false, true);
     //std::vector<cv::Point> approx;
     //cv::approxPolyDP(hull, approx, double(0.1*arcLength(hull,true)),true);
-    drawApproxCurve(image, hull, CV_RGB(0,0,255));
+    //drawApproxCurve(image, hull, CV_RGB(0,0,255));
     /*
     std::vector<cv::Vec4i> convexityDefects;
     std::vector<cv::Vec4i> newDefects;
@@ -495,6 +461,7 @@ namespace argosServer {
     }
   */
 
+  /*
   void HandDetector::fingertip(vector<cv::Point> &contour, cv::Mat& image,cv:: Point armcenter ) {
     int dotproduct,i;
     float length1,length2,angle,minangle,length;
@@ -596,7 +563,7 @@ namespace argosServer {
     }
     //cvClearSeq(fingerseq);
   }
-
+  */
   void  HandDetector::drawApproxCurve(Mat &in, vector<Point>  &contour, Scalar color ) {
     for (unsigned int i=0; i<contour.size(); i++) {
       cv::line (in, contour[i], contour[(i+1) % contour.size()], color, 3);
@@ -616,20 +583,21 @@ namespace argosServer {
     return indexOfBiggestContour;
   }
 
-  float HandDetector::distanceP2P(cv::Point a, cv::Point b) {
+  /*
+   float HandDetector::distanceP2P(cv::Point a, cv::Point b) {
     float d= sqrt(fabs( pow(a.x-b.x,2) + pow(a.y-b.y,2) )) ;
     return d;
-  }
+    }
 
-  float HandDetector::getAngle(cv::Point s, cv::Point f, cv::Point e) {
-    float l1 = distanceP2P(f,s);
+ float HandDetector::getAngle(cv::Point s, cv::Point f, cv::Point e) {
+ float l1 = distanceP2P(f,s);
     float l2 = distanceP2P(f,e);
     float dot = (s.x-f.x) * (e.x-f.x) + (s.y-f.y) * (e.y-f.y);
     float angle = acos(dot / (l1*l2));
     angle = angle * 180/CV_PI;
     return angle;
-  }
-  /*
+    }
+
   bool HandDetector::isInto (cv::Mat &contour, vector<cv::Point2f> &b) {
     for (unsigned int i=0; i<b.size(); i++)
       if (pointPolygonTest(contour, b[i], false) >0) return true;
